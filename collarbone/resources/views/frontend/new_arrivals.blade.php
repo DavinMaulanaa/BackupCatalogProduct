@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collarbone - New Arrivals</title>
+  <link rel="icon" type="image/png" href="{{ asset('img/collarbone.jpg') }}">
+  <meta name="description" content="Contemporary streetwear from Jakarta. Minimal design, premium quality." />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+          },
+          letterSpacing: {
+            'widest': '0.15em',
+            'super': '0.3em',
+            'mega': '0.5em',
+          },
+          colors: {
+            orbis: {
+              teal: '#2a9d9d',
+              charcoal: '#262626',
+              grey: '#808080',
+            }
+          },
+          aspectRatio: {
+            'product': '3 / 4',
+          },
+          keyframes: {
+            'fade-in': {
+              from: { opacity: '0', transform: 'translateY(10px)' },
+              to: { opacity: '1', transform: 'translateY(0)' },
+            },
+            'slide-up': {
+              from: { transform: 'translateY(100%)' },
+              to: { transform: 'translateY(0)' }
+            }
+          },
+          animation: {
+            'fade-in': 'fade-in 0.6s ease-out forwards',
+            'slide-up': 'slide-up 0.3s ease-out forwards',
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    * {
+      border-color: hsl(0 0% 90%);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero-text-shadow {
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Product Card Styles */
+    .product-card-image {
+      transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .group:hover .product-card-image {
+      transform: scale(1.05);
+    }
+
+    /* Filter Dropdown */
+    .filter-btn {
+      position: relative;
+    }
+
+    .filter-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: black;
+      transition: width 0.3s;
+    }
+
+    .filter-btn:hover::after {
+      width: 100%;
+    }
+
+    /* Scrollbar hide */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Blur In Animation */
+    .blur-in {
+      opacity: 0;
+      filter: blur(10px);
+      transform: scale(0.95);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .blur-in.visible {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+
+    .delay-100 {
+      transition-delay: 100ms;
+    }
+
+    .delay-200 {
+      transition-delay: 200ms;
+    }
+
+    .delay-300 {
+      transition-delay: 300ms;
+    }
+
+    /* Flip Card Styles */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+
+    .backface-hidden {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* ===== TikTok-Style Image Slider ===== */
+    .product-slider {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: pan-y;
+    }
+
+    .product-slider-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+    }
+
+    .product-slider-track.is-dragging {
+      transition: none;
+    }
+
+    .product-slider-slide {
+      min-width: 100%;
+      width: 100%;
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .product-slider-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Dot Indicators */
+    .slider-dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+      padding: 4px 8px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(4px);
+    }
+
+    .slider-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .slider-dot.active {
+      background: #ffffff;
+      transform: scale(1.3);
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Slide counter (optional TikTok style) */
+    .slider-counter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      font-size: 11px;
+      font-weight: 500;
+      color: white;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-white text-black">
+
+  <!-- Header -->
+  <header
+    class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm transition-all duration-300 border-b border-neutral-200/50">
+    <div class="flex items-center justify-between px-6 lg:px-12 h-[4.5rem]">
+      <!-- Logo -->
+      <a href="/" class="flex items-center group">
+        <img src="{{ asset('img/collarbone.jpg') }}" alt="Collarbone Logo"
+          class="h-10 w-auto object-contain group-hover:opacity-80 transition-opacity duration-300 rounded-full">
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden lg:flex items-center gap-10">
+        <a href="{{ route('home') }}" class="relative group py-2 block">
+          <span
+            class="text-xs font-medium tracking-[0.15em] uppercase text-neutral-900 transition-colors group-hover:text-orbis-teal">Dashboard</span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-[1.5px] bg-orbis-teal transition-all duration-300 ease-out group-hover:w-full"></span>
+        </a>
+        <a href="{{ route('new_arrivals') }}" class="relative group py-2 block">
+          <span
+            class="text-xs font-medium tracking-[0.15em] uppercase text-orbis-teal transition-colors group-hover:text-orbis-teal">New
+            Arrivals</span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-[1.5px] bg-orbis-teal transition-all duration-300 ease-out group-hover:w-full"></span>
+        </a>
+        <a href="{{ route('categories') }}" class="relative group py-2 block">
+          <span
+            class="text-xs font-medium tracking-[0.15em] uppercase text-neutral-900 transition-colors group-hover:text-orbis-teal">Categories</span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-[1.5px] bg-orbis-teal transition-all duration-300 ease-out group-hover:w-full"></span>
+        </a>
+      </nav>
+
+      <!-- Mobile Menu Toggle -->
+      <button id="menuToggle" class="lg:hidden group p-2 hover:bg-neutral-100 rounded-full transition-colors">
+        <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+          class="group-hover:stroke-orbis-teal transition-colors">
+          <line x1="3" x2="21" y1="6" y2="6" />
+          <line x1="3" x2="21" y1="12" y2="12" />
+          <line x1="3" x2="21" y1="18" y2="18" />
+        </svg>
+        <svg id="closeIcon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+          class="group-hover:stroke-orbis-teal transition-colors">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav id="mobileMenu"
+      class="lg:hidden hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-neutral-200 animate-slide-in shadow-lg">
+      <div class="py-8 px-6 space-y-6 flex flex-col items-center">
+        <a href="{{ route('home') }}"
+          class="text-sm font-medium tracking-[0.2em] uppercase hover:text-orbis-teal transition-colors relative group">
+          Dashboard
+          <span
+            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-orbis-teal transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="{{ route('new_arrivals') }}"
+          class="text-sm font-medium tracking-[0.2em] uppercase hover:text-orbis-teal transition-colors relative group">
+          New Arrivals
+          <span
+            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-orbis-teal transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a href="{{ route('categories') }}"
+          class="text-sm font-medium tracking-[0.2em] uppercase hover:text-orbis-teal transition-colors relative group">
+          Categories
+          <span
+            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-orbis-teal transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1">
+
+    <!-- Hero Banner -->
+    <section class="relative h-[50vh] w-full overflow-hidden">
+      <img src="{{ asset('img/Wallpaper.jpeg') }}" alt="New Collection" class="absolute inset-0 w-full h-full object-cover">
+      <div class="absolute inset-0 bg-black/20"></div>
+      <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4">
+        <p class="text-xs md:text-sm tracking-mega mb-2 animate-fade-in hero-text-shadow">SEASON 04</p>
+        <h1 class="text-4xl md:text-6xl tracking-widest font-light animate-fade-in hero-text-shadow"
+          style="animation-delay: 0.1s;">FRESH DROPS</h1>
+        <p class="mt-4 text-xs tracking-widest max-w-md mx-auto animate-fade-in hero-text-shadow"
+          style="animation-delay: 0.2s;">
+          Discover the latest additions to our collection. Crafted for the modern urban explorer.
+        </p>
+      </div>
+    </section>
+
+    <!-- Filters & Sort -->
+    <div class="sticky top-[4.5rem] z-40 bg-white/95 backdrop-blur-sm border-b border-neutral-100">
+      <div class="flex flex-col md:flex-row items-center justify-between px-6 lg:px-12 py-4 gap-4">
+
+        <!-- Mobile Filter Toggle (visible only on small) -->
+        <div class="md:hidden w-full flex justify-between">
+          <button class="text-xs uppercase tracking-widest flex items-center gap-2">
+            Filters <span
+              class="bg-black text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px]">2</span>
+          </button>
+          <button class="text-xs uppercase tracking-widest">Sort By</button>
+        </div>
+        <div class="hidden md:flex items-center gap-2">
+          <span class="text-[10px] text-neutral-400 uppercase tracking-widest">Sort by:</span>
+          <select class="text-xs uppercase tracking-widest border-none bg-transparent focus:ring-0 cursor-pointer">
+            <option>Latest</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+          </select>
+        </div>
+
+        <div class="hidden md:block text-[10px] text-neutral-400 tracking-widest">
+          {{ $products->count() }} PRODUCTS
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <section class="w-full mx-auto px-6 lg:px-12 py-12">
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
+
+        @foreach($products as $index => $product)
+            <!-- Spotlight Section logic: Insert after 4th product -->
+            @if($index == 4)
+             <!-- Spotlight Section (Breaks the grid) -->
+             <div class="col-span-2 md:col-span-4 py-8 blur-in">
+                <div class="relative w-full h-[400px] overflow-hidden group">
+                  <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070&auto=format&fit=crop"
+                    class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105">
+                  <div class="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors duration-500"></div>
+                  <div class="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-6">
+                    <p class="text-xs tracking-mega mb-2">LIMITED EDITION</p>
+                    <h2 class="text-3xl md:text-5xl font-light tracking-widest mb-6">THE EDGE SERIES</h2>
+                  </div>
+                </div>
+              </div>
+            @endif
+
+            <article class="group cursor-pointer blur-in delay-{{ ($index % 4) * 100 }}">
+              <!-- Image flip container -->
+              <div class="perspective-1000 mb-4">
+                <div class="relative transition-all duration-700 transform-style-3d w-full aspect-[3/4]">
+                  <!-- Front (Slider) -->
+                  <div class="absolute inset-0 backface-hidden bg-neutral-100 overflow-hidden rounded-sm border-2 border-black">
+                    <div class="product-slider" data-slider>
+                      <div class="product-slider-track">
+                          @if(!empty($product->image_urls))
+                              @foreach($product->image_urls as $img)
+                              <div class="product-slider-slide">
+                                  <img src="{{ Str::startsWith($img, 'http') ? $img : asset($img) }}" alt="{{ $product->name }}">
+                              </div>
+                              @endforeach
+                          @else
+                              <div class="product-slider-slide"><img src="{{ asset('img/placeholder.jpg') }}" alt="Placeholder"></div>
+                          @endif
+                      </div>
+                      <div class="slider-dots"></div>
+                      <div class="slider-counter">1 / {{ is_array($product->image_urls) ? count($product->image_urls) : 0 }}</div>
+                    </div>
+                  </div>
+                  <!-- Back (Description) -->
+                  <div class="absolute inset-0 backface-hidden rotate-y-180 bg-white border border-neutral-100 p-6 flex flex-col items-center justify-center text-center rounded-sm">
+                    <h3 class="text-xs font-medium uppercase tracking-widest mb-4">{{ $product->name }}</h3>
+                    <p class="text-xs text-neutral-500 leading-relaxed mb-6">{{ Str::limit($product->description, 100) }}</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Product info -->
+              <p class="text-[10px] tracking-widest text-neutral-500 mb-1">{{ $product->category->name ?? 'CATEGORY' }}</p>
+              <h3 class="text-sm font-medium text-neutral-900 mb-1">{{ $product->name }}</h3>
+              <div class="flex items-end justify-between mb-2">
+                <div>
+                  <p class="text-sm font-medium mb-1">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                  <div class="flex gap-2 text-[10px] font-medium tracking-wider">
+                    @foreach($product->sizes ?? [] as $size)
+                        <span class="text-green-600">{{ $size }}</span>
+                    @endforeach
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <div class="flex gap-1">
+                     @foreach($product->colors ?? [] as $color)
+                        <span class="w-3 h-3 rounded-full border border-neutral-200" 
+                              style="background-color: {{ strtolower($color) === 'cream' ? '#E5D0B1' : strtolower($color) }}" 
+                              title="{{ $color }}"></span>
+                     @endforeach
+                  </div>
+                  <button class="details-btn uppercase tracking-widest px-3 py-1.5 border border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium">Details</button>
+                </div>
+              </div>
+            </article>
+        @endforeach
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 bg-black">
+    <div class="w-full mx-auto px-4 max-w-[1400px] py-12 text-center">
+      <p class="text-xs text-gray-500">
+        © 2026 Collarbone. Banyumas.
+      </p>
+    </div>
+  </footer>
+
+
+  <!-- Scripts -->
+  <script>
+    // ===== TikTok-Style Product Slider =====
+    class ProductSlider {
+      constructor(el) {
+        this.el = el;
+        this.track = el.querySelector('.product-slider-track');
+        this.slides = el.querySelectorAll('.product-slider-slide');
+        this.dotsContainer = el.querySelector('.slider-dots');
+        this.counter = el.querySelector('.slider-counter');
+        this.currentIndex = 0;
+        this.totalSlides = this.slides.length;
+        this.isDragging = false;
+        this.startX = 0;
+        this.currentTranslate = 0;
+        this.prevTranslate = 0;
+        this.animationID = null;
+
+        if(this.totalSlides > 0) this.init();
+      }
+
+      init() {
+        // Create dots
+        for (let i = 0; i < this.totalSlides; i++) {
+          const dot = document.createElement('button');
+          dot.classList.add('slider-dot');
+          if (i === 0) dot.classList.add('active');
+          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.goToSlide(i);
+          });
+          this.dotsContainer.appendChild(dot);
+        }
+
+        // Touch events
+        this.el.addEventListener('touchstart', this.touchStart.bind(this), { passive: true });
+        this.el.addEventListener('touchmove', this.touchMove.bind(this), { passive: false });
+        this.el.addEventListener('touchend', this.touchEnd.bind(this));
+
+        // Mouse events (for desktop)
+        this.el.addEventListener('mousedown', this.touchStart.bind(this));
+        this.el.addEventListener('mousemove', this.touchMove.bind(this));
+        this.el.addEventListener('mouseup', this.touchEnd.bind(this));
+        this.el.addEventListener('mouseleave', () => {
+          if (this.isDragging) this.touchEnd();
+        });
+
+        // Prevent context menu on long press
+        this.el.addEventListener('contextmenu', (e) => e.preventDefault());
+      }
+
+      getPositionX(event) {
+        return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+      }
+
+      touchStart(event) {
+        this.isDragging = true;
+        this.startX = this.getPositionX(event);
+        this.track.classList.add('is-dragging');
+        this.animationID = requestAnimationFrame(this.animation.bind(this));
+      }
+
+      touchMove(event) {
+        if (!this.isDragging) return;
+        const currentX = this.getPositionX(event);
+        const diff = currentX - this.startX;
+        this.currentTranslate = this.prevTranslate + diff;
+
+        // Prevent default to stop page scrolling while swiping horizontally
+        if (Math.abs(diff) > 5) {
+          event.preventDefault();
+        }
+      }
+
+      touchEnd() {
+        this.isDragging = false;
+        cancelAnimationFrame(this.animationID);
+        this.track.classList.remove('is-dragging');
+
+        const movedBy = this.currentTranslate - this.prevTranslate;
+        const threshold = this.el.offsetWidth * 0.15; // 15% swipe threshold
+
+        if (movedBy < -threshold && this.currentIndex < this.totalSlides - 1) {
+          this.currentIndex++;
+        } else if (movedBy > threshold && this.currentIndex > 0) {
+          this.currentIndex--;
+        }
+
+        this.setPositionByIndex();
+        this.updateDots();
+        this.updateCounter();
+      }
+
+      animation() {
+        this.setSliderPosition();
+        if (this.isDragging) {
+          requestAnimationFrame(this.animation.bind(this));
+        }
+      }
+
+      setSliderPosition() {
+        this.track.style.transform = `translateX(${this.currentTranslate}px)`;
+      }
+
+      setPositionByIndex() {
+        this.currentTranslate = this.currentIndex * -this.el.offsetWidth;
+        this.prevTranslate = this.currentTranslate;
+        this.track.style.transform = `translateX(${this.currentTranslate}px)`;
+      }
+
+      goToSlide(index) {
+        this.currentIndex = index;
+        this.setPositionByIndex();
+        this.updateDots();
+        this.updateCounter();
+      }
+
+      updateDots() {
+        const dots = this.dotsContainer.querySelectorAll('.slider-dot');
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === this.currentIndex);
+        });
+      }
+
+      updateCounter() {
+        if (this.counter) {
+          this.counter.textContent = `${this.currentIndex + 1} / ${this.totalSlides}`;
+        }
+      }
+    }
+
+    // Initialize all sliders
+    document.querySelectorAll('[data-slider]').forEach(slider => {
+      new ProductSlider(slider);
+    });
+
+    // Navigation
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    if (menuToggle) {
+      menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        menuIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+      });
+    }
+
+    // Blur In Animation Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '50px'
+    });
+
+    document.querySelectorAll('.blur-in').forEach(el => observer.observe(el));
+
+    // Flip Card Interaction
+    document.querySelectorAll('.details-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const article = btn.closest('article');
+        const cardInner = article ? article.querySelector('.transform-style-3d') : null;
+
+        if (cardInner) {
+          btn.classList.add('opacity-0', 'scale-90');
+
+          const isFlippingToBack = !cardInner.classList.contains('rotate-y-180');
+          if (isFlippingToBack) {
+            cardInner.classList.add('rotate-y-180');
+          } else {
+            cardInner.classList.remove('rotate-y-180');
+          }
+
+          setTimeout(() => {
+            btn.textContent = isFlippingToBack ? 'Back' : 'Details';
+            btn.classList.remove('opacity-0', 'scale-90');
+          }, 300);
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>
