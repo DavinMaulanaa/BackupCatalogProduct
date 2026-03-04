@@ -47,7 +47,7 @@ class ProductController extends Controller
 
         $products = $query->paginate(10);
         $categories = Category::where('is_active', true)->orderBy('name')->get();
-
+        
         return view('admin.products.index', compact('products', 'categories'));
     }
 
@@ -245,6 +245,7 @@ class ProductController extends Controller
         // Testimonials & Collections for dashboard management
         $testimonials = Testimonial::orderBy('sort_order')->get();
         $collections = Collection::orderBy('sort_order')->get();
+        $heroSlides = \App\Models\HeroSlide::orderBy('sort_order')->get();
 
         return view('admin.dashboard', compact(
             'totalProducts',
@@ -256,7 +257,8 @@ class ProductController extends Controller
             'recentProducts',
             'categoriesWithCount',
             'testimonials',
-            'collections'
+            'collections',
+            'heroSlides'
         ));
     }
 
@@ -278,8 +280,19 @@ class ProductController extends Controller
             $query->search($request->search);
         }
 
-        $products = $query->latest()->paginate(10);
+        $products = $query->orderByRaw('sort_order = 0, sort_order')->latest()->paginate(10);
         $categories = Category::where('is_active', true)->get();
+
+        // Banner Data
+        $banner = \App\Models\Banner::firstOrCreate(
+            ['page_name' => 'new_arrivals'],
+            [
+                'image_path' => 'img/Wallpaper.jpeg',
+                'title' => 'FRESH DROPS',
+                'subtitle' => 'Discover the latest additions to our collection.',
+                'text_color' => '#FFFFFF'
+            ]
+        );
 
         return view('admin.new_arrivals.index', compact(
             'products', 
@@ -287,7 +300,8 @@ class ProductController extends Controller
             'totalProducts', 
             'inStock', 
             'lowStock', 
-            'totalValue'
+            'totalValue',
+            'banner'
         ));
     }
 
@@ -342,5 +356,23 @@ class ProductController extends Controller
             'is_new_arrival' => $product->is_new_arrival,
             'message' => $product->is_new_arrival ? 'Ditambahkan ke New Arrivals!' : 'Dihapus dari New Arrivals!',
         ]);
+    }
+
+
+    /**
+     * Update the sort order of a product.
+     */
+    public function updateSortOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|exists:products,id',
+            'sort_order' => 'required|integer|min:0',
+        ]);
+
+        $product = Product::findOrFail($validated['id']);
+        $product->sort_order = $validated['sort_order'];
+        $product->save();
+
+        return response()->json(['success' => true]);
     }
 }

@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('banners', function (Blueprint $table) {
+        Schema::create('hero_slides', function (Blueprint $table) {
             $table->id();
-            $table->string('page_name')->unique()->comment('Identifier for the banner location (e.g. new_arrivals)');
             $table->string('image_path');
             $table->string('title')->nullable();
             $table->string('subtitle')->nullable();
-            $table->string('text_color')->default('#FFFFFF')->comment('Hex code or CSS class for text color');
+            $table->string('link')->nullable();
+            $table->integer('sort_order')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('banners');
+        Schema::dropIfExists('hero_slides');
     }
 };

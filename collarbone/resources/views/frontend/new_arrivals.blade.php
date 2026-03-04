@@ -343,15 +343,15 @@
 
     <!-- Hero Banner -->
     <section class="relative h-[50vh] w-full overflow-hidden">
-      <img src="{{ asset('img/Wallpaper.jpeg') }}" alt="New Collection" class="absolute inset-0 w-full h-full object-cover">
+      <img src="{{ $banner->image_url }}" alt="New Collection" class="absolute inset-0 w-full h-full object-cover">
       <div class="absolute inset-0 bg-black/20"></div>
-      <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4">
+      <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4" style="color: {{ $banner->text_color }}">
         <p class="text-xs md:text-sm tracking-mega mb-2 animate-fade-in hero-text-shadow">SEASON 04</p>
         <h1 class="text-4xl md:text-6xl tracking-widest font-light animate-fade-in hero-text-shadow"
-          style="animation-delay: 0.1s;">FRESH DROPS</h1>
+          style="animation-delay: 0.1s;">{{ $banner->title }}</h1>
         <p class="mt-4 text-xs tracking-widest max-w-md mx-auto animate-fade-in hero-text-shadow"
           style="animation-delay: 0.2s;">
-          Discover the latest additions to our collection. Crafted for the modern urban explorer.
+          {{ $banner->subtitle }}
         </p>
       </div>
     </section>

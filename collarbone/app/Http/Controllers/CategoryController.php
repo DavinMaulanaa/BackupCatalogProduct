@@ -31,7 +31,9 @@ class CategoryController extends Controller
         $sortDir = $request->get('dir', 'asc');
         $query->orderBy($sortBy, $sortDir);
 
-        $categories = $query->with('products')->paginate(10);
+        $categories = $query->with(['products' => function($q) {
+            $q->orderByRaw('sort_order = 0, sort_order');
+        }])->paginate(10);
         $totalCategories = Category::count();
         $totalProducts = \App\Models\Product::count();
 

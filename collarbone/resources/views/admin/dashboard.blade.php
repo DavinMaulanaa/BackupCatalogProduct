@@ -360,6 +360,95 @@
         </div>
     </div>
 
+    <!-- ==================== HERO SLIDER SECTION ==================== -->
+    <div class="card slide-in-up" style="animation-delay: 0.38s; margin-top: 24px;">
+        <div class="card-header">
+            <h2>🖼️ Kelola Hero Slider</h2>
+            <button class="btn btn-primary btn-sm" onclick="openModal('addHeroSlideModal')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Tambah Slide
+            </button>
+        </div>
+        
+        <!-- Live Preview Section -->
+        <div class="slider-preview-container" style="position:relative; width:100%; height:320px; overflow:hidden; border-radius:var(--radius); margin-bottom:24px; background:#000;">
+            @forelse($heroSlides as $index => $slide)
+                <div class="preview-slide {{ $index === 0 ? 'active' : '' }}" style="position:absolute; inset:0; opacity:0; transition:opacity 1s ease; z-index:1;">
+                    <img src="{{ $slide->image_url }}" alt="Slide" style="width:100%; height:100%; object-fit:cover;">
+                    <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
+                    
+                    <div class="preview-content" style="position:absolute; bottom:40px; left:40px; color:white; text-align:left;">
+                        <p style="font-size:12px; letter-spacing:3px; margin-bottom:10px; opacity:0.9; text-transform:uppercase;">{{ $slide->subtitle ?? 'SUBTITLE' }}</p>
+                        <h2 style="font-size:32px; font-weight:300; letter-spacing:2px; margin-bottom:20px;">{{ $slide->title ?? 'Title' }}</h2>
+                        <a href="#" style="display:inline-block; padding:10px 30px; border:1px solid white; color:white; text-decoration:none; text-transform:uppercase; font-size:12px; letter-spacing:2px;">ORDER NOW</a>
+                    </div>
+                </div>
+            @empty
+               <div class="preview-slide active" style="position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; background:#222; color:#555;">
+                   <p>Belum ada slide aktif.</p>
+               </div>
+            @endforelse
+
+            <!-- Dots -->
+            <div class="preview-dots" style="position:absolute; bottom:40px; right:40px; display:flex; gap:10px; z-index:10;">
+                @foreach($heroSlides as $index => $slide)
+                    <button class="preview-dot {{ $index === 0 ? 'active' : '' }}" onclick="goToPreviewSlide({{ $index }})" style="width:10px; height:10px; border-radius:50%; border:none; background:rgba(255,255,255,0.3); cursor:pointer; transition:background 0.3s;"></button>
+                @endforeach
+            </div>
+        </div>
+        <style>
+            .preview-slide.active { opacity: 1 !important; z-index: 2 !important; }
+            .preview-dot.active { background: white !important; }
+        </style>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Preview</th>
+                        <th>Judul & Subtitle</th>
+                        <th>Link</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($heroSlides as $slide)
+                        <tr>
+                            <td>
+                                <img src="{{ $slide->image_url }}" alt="Slide" class="product-thumb" style="width:120px; height:60px; object-fit:cover; border-radius: var(--radius-sm);">
+                            </td>
+                            <td>
+                                <div class="product-info">
+                                    <h4>{{ $slide->title ?? '-' }}</h4>
+                                    <span>{{ $slide->subtitle ?? '-' }}</span>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-info">{{ $slide->link ? Str::limit($slide->link, 20) : '-' }}</span></td>
+                            <td>
+                                <button class="toggle-btn {{ $slide->is_active ? 'active' : 'inactive' }}"
+                                        onclick="toggleHeroSlideStatus({{ $slide->id }}, this)">
+                                    {{ $slide->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </button>
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <button class="btn-icon" title="Edit" onclick="editHeroSlide({{ json_encode($slide) }})">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    </button>
+                                    <button class="btn-icon" style="color:var(--danger);" title="Hapus" onclick="confirmDeleteHeroSlide({{ $slide->id }})">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px">Belum ada slide</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- ==================== TESTIMONIALS SECTION ==================== -->
     <div class="card slide-in-up" style="animation-delay: 0.4s; margin-top: 24px;">
         <div class="card-header">
@@ -665,6 +754,74 @@
             </div>
         </div>
     </div>
+    <!-- Add Hero Slide Modal -->
+    <div id="addHeroSlideModal" class="modal-overlay">
+        <div class="modal" style="max-width:550px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Tambah Hero Slide</h2>
+                <button type="button" class="modal-close" onclick="closeModal('addHeroSlideModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <form action="{{ route('admin.hero_slides.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group"><label class="form-label">Upload Gambar *</label><input type="file" name="image" class="form-control" accept="image/*" required></div>
+                    <div class="form-group"><label class="form-label">Judul</label><input type="text" name="title" class="form-control" placeholder="e.g. SUMMER SALE"></div>
+                    <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" class="form-control" placeholder="e.g. Up to 50% Off"></div>
+                    <div class="form-group"><label class="form-label">Link</label><input type="url" name="link" class="form-control" placeholder="https://..."></div>
+                    <div class="form-group"><label class="form-label">Urutan</label><input type="number" name="sort_order" class="form-control" value="0"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addHeroSlideModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Hero Slide Modal -->
+    <div id="editHeroSlideModal" class="modal-overlay">
+        <div class="modal" style="max-width:550px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Hero Slide</h2>
+                <button type="button" class="modal-close" onclick="closeModal('editHeroSlideModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <form id="editHeroSlideForm" method="POST" enctype="multipart/form-data">
+                @csrf @method('PUT')
+                <div class="modal-body">
+                    <div class="form-group"><label class="form-label">Upload Gambar Baru</label><input type="file" name="image" class="form-control" accept="image/*"></div>
+                    <div class="form-group"><label class="form-label">Judul</label><input type="text" name="title" id="editHeroTitle" class="form-control"></div>
+                    <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" id="editHeroSubtitle" class="form-control"></div>
+                    <div class="form-group"><label class="form-label">Link</label><input type="url" name="link" id="editHeroLink" class="form-control"></div>
+                    <div class="form-group"><label class="form-label">Urutan</label><input type="number" name="sort_order" id="editHeroOrder" class="form-control"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editHeroSlideModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Hero Slide Modal -->
+    <div id="deleteHeroSlideModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Hapus Slide</h2>
+                <button type="button" class="modal-close" onclick="closeModal('deleteHeroSlideModal')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-dialog">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <h3>Yakin ingin menghapus?</h3>
+                    <p>Slide ini akan dihapus secara permanen.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteHeroSlideModal')">Batal</button>
+                <form id="deleteHeroSlideForm" method="POST" style="display:inline;">@csrf @method('DELETE')<button type="submit" class="btn btn-danger">Hapus</button></form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
@@ -813,6 +970,63 @@
         document.getElementById('deleteCollectionMessage').textContent = `Collection "${title}" akan dihapus secara permanen.`;
         document.getElementById('deleteCollectionForm').action = `/admin/collections/${id}`;
         openModal('deleteCollectionModal');
+    }
+    
+    // ==================== HERO SLIDE FUNCTIONS ====================
+    function editHeroSlide(slide) {
+        document.getElementById('editHeroSlideForm').action = `/admin/hero_slides/${slide.id}`;
+        document.getElementById('editHeroTitle').value = slide.title || '';
+        document.getElementById('editHeroSubtitle').value = slide.subtitle || '';
+        document.getElementById('editHeroLink').value = slide.link || '';
+        document.getElementById('editHeroOrder').value = slide.sort_order || 0;
+        openModal('editHeroSlideModal');
+    }
+
+    function toggleHeroSlideStatus(id, btn) {
+        fetch(`/admin/hero_slides/${id}/toggle-status`, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                btn.className = `toggle-btn ${data.is_active ? 'active' : 'inactive'}`;
+                btn.textContent = data.is_active ? 'Aktif' : 'Nonaktif';
+                showToast(data.message, 'success');
+            }
+        })
+        .catch(() => showToast('Gagal mengubah status', 'error'));
+    }
+
+    function confirmDeleteHeroSlide(id) {
+        document.getElementById('deleteHeroSlideForm').action = `/admin/hero_slides/${id}`;
+        openModal('deleteHeroSlideModal');
+    }
+
+    // Preview Slider Logic
+    let currentPreviewSlide = 0;
+    const previewSlides = document.querySelectorAll('.preview-slide');
+    const previewDots = document.querySelectorAll('.preview-dot');
+
+    function goToPreviewSlide(index) {
+        if(!previewSlides.length) return;
+        previewSlides.forEach(s => s.classList.remove('active'));
+        previewDots.forEach(d => d.classList.remove('active'));
+        
+        previewSlides[index].classList.add('active');
+        previewDots[index].classList.add('active');
+        currentPreviewSlide = index;
+    }
+
+    if(previewSlides.length > 0) {
+        setInterval(() => {
+            let next = (currentPreviewSlide + 1) % previewSlides.length;
+            goToPreviewSlide(next);
+        }, 5000);
     }
 </script>
 @endsection

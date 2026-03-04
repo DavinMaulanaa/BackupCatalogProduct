@@ -66,6 +66,10 @@
       background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent, transparent);
     }
 
+    .stroke-text {
+      -webkit-text-stroke: 1px white;
+    }
+
     /* Slider dots */
     .slider-dot {
       width: 8px;
@@ -132,32 +136,42 @@
     <!-- Hero Slider -->
     <section id="heroSlider" class="relative h-[calc(100vh-4.5rem-0.375rem)] overflow-hidden">
       <!-- Slides -->
-      <div class="slide active absolute inset-0 transition-opacity duration-1000 opacity-100">
-        <img src="{{ asset('img/baju.jpg') }}" alt="Straight edge" class="w-full h-full object-cover">
-        <div class="hero-overlay absolute inset-0"></div>
-      </div>
-      <div class="slide absolute inset-0 transition-opacity duration-1000 opacity-0">
-        <img src="{{ asset('img/7.png') }}" alt="Room for Air Collection" class="w-full h-full object-cover">
-        <div class="hero-overlay absolute inset-0"></div>
-      </div>
-      <div class="slide absolute inset-0 transition-opacity duration-1000 opacity-0">
-        <img src="{{ asset('img/MerchBG.png') }}" alt="Wooden Sun Collection" class="w-full h-full object-cover">
-        <div class="hero-overlay absolute inset-0"></div>
-      </div>
+      @forelse($heroSlides as $index => $slide)
+          <div class="slide {{ $index === 0 ? 'active' : '' }} absolute inset-0 transition-opacity duration-1000 {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}">
+            <img src="{{ $slide->image_url }}" alt="{{ $slide->title }}" class="w-full h-full object-cover">
+            <div class="hero-overlay absolute inset-0"></div>
+          </div>
+      @empty
+          <!-- Default Slide if no data -->
+          <div class="slide active absolute inset-0 transition-opacity duration-1000 opacity-100">
+            <img src="{{ asset('img/baju.jpg') }}" alt="Default" class="w-full h-full object-cover">
+            <div class="hero-overlay absolute inset-0"></div>
+          </div>
+      @endforelse
+
       <!-- Content -->
-      <div class="absolute bottom-16 left-6 lg:left-12 z-10">
-        <p id="slideLabel" class="text-white text-xs tracking-orbis-wide mb-2 animate-fade-up">NEW ARRIVALS</p>
+      <div class="absolute bottom-16 left-6 lg:left-12 z-10 transition-all duration-500" id="slideContent">
+        <p id="slideLabel" class="text-white text-xs tracking-orbis-wide mb-2 animate-fade-up">
+            {{ $heroSlides->first()->subtitle ?? 'NEW ARRIVALS' }}
+        </p>
         <h2 id="slideTitle" class="text-white text-3xl lg:text-5xl font-light tracking-orbis mb-6 animate-fade-up">
-          T Shirt</h2>
-        <a href="#"
-          class="inline-flex items-center justify-center px-8 py-3 text-xs font-medium tracking-[0.2em] uppercase bg-white text-neutral-900 border border-white hover:bg-neutral-900 hover:text-white transition-all duration-300">ORDER
-          NOW</a>
+          {{ $heroSlides->first()->title ?? 'Welcome' }}
+        </h2>
+        <a id="slideLink" href="{{ $heroSlides->first()->link ?? '#' }}"
+          class="inline-flex items-center justify-center px-8 py-3 text-xs font-medium tracking-[0.2em] uppercase bg-white text-neutral-900 border border-white hover:bg-neutral-900 hover:text-white transition-all duration-300">
+          ORDER NOW
+        </a>
       </div>
+
       <!-- Dots Navigation -->
       <div class="absolute bottom-16 right-6 lg:right-12 flex gap-3 z-10">
-        <button class="slider-dot active" data-slide="0"></button>
-        <button class="slider-dot" data-slide="1"></button>
-        <button class="slider-dot" data-slide="2"></button>
+        @if($heroSlides->count() > 0)
+            @foreach($heroSlides as $index => $slide)
+                <button class="slider-dot {{ $index === 0 ? 'active' : '' }}" onclick="goToSlide({{ $index }})"></button>
+            @endforeach
+        @else
+            <button class="slider-dot active"></button>
+        @endif
       </div>
     </section>
 
@@ -173,8 +187,8 @@
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 bg-gray-200">
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
           <div class="absolute bottom-6 left-6">
-            <p class="text-white text-xs tracking-orbis-wide mb-2">{{ $collection->subtitle ?? 'CATEGORY' }}</p>
-            <h3 class="text-white text-xl lg:text-2xl font-light tracking-orbis">{{ $collection->title }}</h3>
+            <p class="text-black text-xs tracking-orbis-wide mb-2">{{ $collection->subtitle ?? 'CATEGORY' }}</p>
+            <h3 class="text-black text-xl lg:text-2xl font-light tracking-orbis">{{ $collection->title }}</h3>
           </div>
         </a>
         @empty
@@ -261,21 +275,24 @@
       </div>
     </section>
 
-    <!-- Newsletter -->
-    <section class="py-16 lg:py-24 px-6 lg:px-12 reveal">
-      <div class="max-w-2xl mx-auto text-center">
-        <h2 class="text-xl lg:text-2xl font-light tracking-orbis mb-4">JOIN THE CIRCLE</h2>
-        <p class="text-sm text-neutral-500 mb-8">Subscribe to receive updates on new arrivals, exclusive offers, and
-          more.</p>
-
-        <form class="flex flex-col sm:flex-row gap-4">
-          <input type="email" placeholder="Enter your email"
-            class="flex-1 bg-transparent border-b border-neutral-900 py-3 text-sm tracking-wide placeholder:text-neutral-500 focus:outline-none focus:border-orbis-teal transition-colors">
-          <button type="submit"
-            class="inline-flex items-center justify-center px-8 py-3 text-xs font-medium tracking-[0.2em] uppercase bg-neutral-900 text-white border border-neutral-900 hover:bg-white hover:text-neutral-900 transition-all duration-300">
-            SUBSCRIBE
-          </button>
-        </form>
+    <!-- Marquee Text Section (Replaced Newsletter) -->
+    <section class="py-12 bg-black overflow-hidden reveal">
+      <div class="flex animate-marquee whitespace-nowrap">
+        <div class="flex items-center">
+            <span class="text-white text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">NO RESTOCKS —</span>
+            <span class="text-transparent stroke-text text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">LIMITED DROPS ONLY —</span>
+            <span class="text-white text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">BORN WITH ART —</span>
+            <span class="text-transparent stroke-text text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">EST 2024 —</span>
+            <span class="text-white text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">COLLARBONE ARCHIVE —</span>
+        </div>
+        <!-- Duplicate for seamless loop -->
+        <div class="flex items-center">
+            <span class="text-white text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">NO RESTOCKS —</span>
+            <span class="text-transparent stroke-text text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">LIMITED DROPS ONLY —</span>
+            <span class="text-white text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">BORN WITH ART —</span>
+            <span class="text-transparent stroke-text text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">EST 2024 —</span>
+            <span class="text-white text-4xl md:text-7xl font-black tracking-tighter uppercase mx-8">COLLARBONE ARCHIVE —</span>
+        </div>
       </div>
     </section>
 
@@ -297,11 +314,8 @@
           <!-- Original Cards -->
           <div class="flex gap-6 mx-3">
             @foreach($testimonials as $testimonial)
-            <div class="bg-white p-8 rounded-2xl shadow-sm w-[400px] flex-shrink-0 flex flex-col justify-between">
+            <div class="bg-white p-8 rounded-2xl shadow-sm w-[400px] flex-shrink-0 flex flex-col justify-between transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-default">
               <div>
-                <svg class="w-10 h-10 text-orbis-teal mb-6 opacity-80" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V11C14.017 11.5523 13.5693 12 13.017 12H12.017V5H22.017V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM5.0166 21L5.0166 18C5.0166 16.8954 5.91203 16 7.0166 16H10.0166C10.5689 16 11.0166 15.5523 11.0166 15V9C11.0166 8.44772 10.5689 8 10.0166 8H6.0166C5.46432 8 5.0166 8.44772 5.0166 9V11C5.0166 11.5523 4.56889 12 4.0166 12H3.0166V5H13.0166V15C13.0166 18.3137 10.3303 21 7.0166 21H5.0166Z" />
-                </svg>
                 <p class="text-neutral-600 font-light leading-relaxed mb-8">"{{ $testimonial->content }}"</p>
               </div>
               <div class="flex items-center gap-4">
@@ -322,11 +336,8 @@
           <!-- Duplicate Cards (for seamless marquee loop) -->
           <div class="flex gap-6 mx-3" aria-hidden="true">
             @foreach($testimonials as $testimonial)
-            <div class="bg-white p-8 rounded-2xl shadow-sm w-[400px] flex-shrink-0 flex flex-col justify-between">
+            <div class="bg-white p-8 rounded-2xl shadow-sm w-[400px] flex-shrink-0 flex flex-col justify-between transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-default">
               <div>
-                <svg class="w-10 h-10 text-orbis-teal mb-6 opacity-80" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H15.017C14.4647 8 14.017 8.44772 14.017 9V11C14.017 11.5523 13.5693 12 13.017 12H12.017V5H22.017V15C22.017 18.3137 19.3307 21 16.017 21H14.017ZM5.0166 21L5.0166 18C5.0166 16.8954 5.91203 16 7.0166 16H10.0166C10.5689 16 11.0166 15.5523 11.0166 15V9C11.0166 8.44772 10.5689 8 10.0166 8H6.0166C5.46432 8 5.0166 8.44772 5.0166 9V11C5.0166 11.5523 4.56889 12 4.0166 12H3.0166V5H13.0166V15C13.0166 18.3137 10.3303 21 7.0166 21H5.0166Z" />
-                </svg>
                 <p class="text-neutral-600 font-light leading-relaxed mb-8">"{{ $testimonial->content }}"</p>
               </div>
               <div class="flex items-center gap-4">
@@ -356,33 +367,59 @@
     const dots = document.querySelectorAll('.slider-dot');
     const slideLabel = document.getElementById('slideLabel');
     const slideTitle = document.getElementById('slideTitle');
+    const slideLink = document.getElementById('slideLink');
 
-    const slideData = [
-      { label: 'NEW ARRIVALS', title: 'Straight Edge' },
-      { label: 'COLLECTION', title: 'Gatau mau di isi apa' },
-      { label: 'ACCESSORIES', title: 'Button Pins' }
-    ];
+    // Get Data from PHP
+    const slideData = @json($heroSlides->map(fn($s) => [
+        'label' => $s->subtitle, 
+        'title' => $s->title, 
+        'link' => $s->link
+    ]));
+
+    // Fallback if empty
+    if(slideData.length === 0) {
+        slideData.push({ label: 'NEW ARRIVALS', title: 'Welcome', link: '#' });
+    }
 
     let currentSlide = 0;
+
     function goToSlide(index) {
+      if(!slides.length) return;
+      
       slides.forEach((slide, i) => {
         slide.style.opacity = i === index ? '1' : '0';
-        // Add active class for zoom effect
-        if (i === index) {
-          slide.classList.add('active');
-        } else {
-          slide.classList.remove('active');
-        }
+        if (i === index) slide.classList.add('active');
+        else slide.classList.remove('active');
       });
+
       dots.forEach((dot, i) => {
         dot.classList.toggle('active', i === index);
       });
-      if (slideLabel) slideLabel.textContent = slideData[index].label;
-      if (slideTitle) slideTitle.textContent = slideData[index].title;
+
+      // Update Text Content with animation reset
+      if(slideData[index]) {
+          if(slideLabel) {
+              slideLabel.style.animation = 'none';
+              slideLabel.offsetHeight; /* trigger reflow */
+              slideLabel.style.animation = null; 
+              slideLabel.textContent = slideData[index].label || '';
+          }
+          if(slideTitle) {
+              slideTitle.style.animation = 'none';
+              slideTitle.offsetHeight; /* trigger reflow */
+              slideTitle.style.animation = null;
+              slideTitle.textContent = slideData[index].title || '';
+          }
+          if(slideLink) {
+              slideLink.href = slideData[index].link || '#';
+          }
+      }
       currentSlide = index;
     }
+    
+    // Add Click Listeners explicitly if needed, though onClick is in HTML
     dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => goToSlide(index));
+       dot.onclick = () => goToSlide(index); 
     });
 
     // Intersection Observer for Scroll Animation

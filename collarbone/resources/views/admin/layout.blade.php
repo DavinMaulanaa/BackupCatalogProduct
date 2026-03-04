@@ -967,97 +967,6 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-        /* ===== BADGES ===== */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-        .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
-
-        /* ===== TOAST NOTIFICATIONS ===== */
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            animation: slideInRight 0.3s ease;
-            min-width: 280px;
-        }
-        .toast-success { border-color: rgba(16, 185, 129, 0.4); }
-        .toast-success svg { color: var(--success); }
-        .toast-error { border-color: rgba(239, 68, 68, 0.4); }
-        .toast-error svg { color: var(--danger); }
-        @keyframes slideInRight {
-            from { transform: translateX(50px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* ===== PAGINATION ===== */
-        .pagination-wrapper {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .pagination-info {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-        .pagination {
-            display: flex;
-            gap: 4px;
-        }
-        .pagination a, .pagination span {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px 12px;
-            font-size: 13px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-        .pagination a:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border-hover);
-            color: var(--text-primary);
-        }
-        .pagination .active span {
-            background: var(--accent-teal);
-            border-color: var(--accent-teal);
-            color: #000;
-        }
-        .pagination .disabled span {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
         }
     </style>
 </head>
@@ -1098,7 +1007,7 @@
             
             <div class="nav-section">
                 <div class="nav-section-title">Content</div>
-                 <a href="#" class="nav-link" onclick="alert('Hero slider managed from Dashboard/New Arrivals page')">
+                 <a href="{{ route('admin.dashboard') }}" class="nav-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
                     Hero Slider
                 </a>
@@ -1113,6 +1022,17 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     Lihat Website
                 </a>
+                <form method="POST" action="{{ route('admin.logout') }}" id="logout-form">
+                    @csrf
+                    <a href="#" class="nav-link" style="color: #ef4444;" onclick="event.preventDefault(); if(confirm('Apakah Anda yakin ingin logout?')) document.getElementById('logout-form').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Logout
+                    </a>
+                </form>
             </div>
         </nav>
     </aside>

@@ -23,21 +23,37 @@ class FrontendController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('welcome', compact('testimonials', 'collections'));
+        $heroSlides = \App\Models\HeroSlide::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('welcome', compact('testimonials', 'collections', 'heroSlides'));
     }
 
     /**
      * New Arrivals page.
      */
+    
     public function newArrivals()
     {
         $products = Product::where('is_new_arrival', true)
             ->where('is_active', true)
             ->with('category')
+            ->orderByRaw('sort_order = 0, sort_order')
             ->latest()
             ->get();
 
-        return view('frontend.new_arrivals', compact('products'));
+        $banner = \App\Models\Banner::firstOrCreate(
+            ['page_name' => 'new_arrivals'],
+            [
+                'image_path' => 'img/Wallpaper.jpeg',
+                'title' => 'FRESH DROPS',
+                'subtitle' => 'Discover the latest additions to our collection.',
+                'text_color' => '#FFFFFF'
+            ]
+        );
+
+        return view('frontend.new_arrivals', compact('products', 'banner'));
     }
 
     /**
@@ -49,7 +65,7 @@ class FrontendController extends Controller
             $query->where('is_active', true);
         }])->first();
 
-        $pinsCategory = \App\Models\Category::where('name', 'PIN BUTTONS')->with(['products' => function($query) {
+        $pinsCategory = \App\Models\Category::where('name', 'PIN BUTTON')->with(['products' => function($query) {
             $query->where('is_active', true);
         }])->first();
 

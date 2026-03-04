@@ -244,18 +244,61 @@
 <!-- Hero Banner Management -->
 <div class="card slide-in-up" style="animation-delay:0.25s; opacity:0; margin-bottom:24px;">
     <div class="card-header">
-        <h2 style="font-size:16px;font-weight:600;">Page Hero Banner</h2>
-        <button class="btn btn-secondary btn-sm" onclick="openModal('editHeroBannerModal')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Edit Banner
-        </button>
+        <h2 style="font-size:16px;font-weight:600;">🖼️ Banner New Arrivals</h2>
     </div>
     <div class="card-body">
-        <div class="hero-preview">
-            <img src="{{ asset('img/Wallpaper.jpeg') }}" alt="New Arrivals Hero Banner" onerror="this.src='https://via.placeholder.com/1200x400?text=Hero+Banner'">
-            <div class="hero-preview-overlay">
-                <p style="color:white; font-size:12px; letter-spacing:0.3em; text-transform:uppercase; margin-bottom:4px;">SEASON 04</p>
-                <h3 style="color:white; font-size:24px; font-weight:300; letter-spacing:0.2em;">FRESH DROPS</h3>
+        <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+            <!-- Preview -->
+            <div style="flex: 1; min-width: 300px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; position: relative;">
+                <img src="{{ $banner->image_url }}" alt="Banner Preview" style="width: 100%; height: 200px; object-fit: cover;">
+                <div style="position: absolute; inset: 0; bg-black/20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: {{ $banner->text_color }}; background: rgba(0,0,0,0.3);">
+                    <h3 style="font-size: 24px; font-weight: 300; letter-spacing: 0.15em; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $banner->title }}</h3>
+                    <p style="font-size: 12px; letter-spacing: 0.1em; max-width: 80%; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $banner->subtitle }}</p>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div style="flex: 1; min-width: 300px;">
+                <form action="{{ route('admin.banners.update', 'new_arrivals') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="form-group">
+                        <label class="form-label">Judul Banner</label>
+                        <input type="text" name="title" class="form-control" value="{{ $banner->title }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subtitle</label>
+                        <input type="text" name="subtitle" class="form-control" value="{{ $banner->subtitle }}">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label class="form-label">Warna Teks</label>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input type="color" id="bannerColorPicker" class="form-control" value="{{ $banner->text_color }}" style="height: 40px; padding: 2px; width: 60px;">
+                                <input type="text" name="text_color" id="bannerColorText" class="form-control" value="{{ $banner->text_color }}" style="flex: 1;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ganti Gambar</label>
+                            <input type="file" name="image_path" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                        
+                    <div class="form-group">
+                        <label class="form-label">Atau URL Gambar</label>
+                            <div style="display:flex; gap:8px;">
+                            <select name="image_url_type" class="form-control" style="width: 100px;">
+                                <option value="file">Upload</option>
+                                <option value="url">URL</option>
+                            </select>
+                            <input type="text" name="image_url" class="form-control" placeholder="https://...">
+                            </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                        <button type="submit" class="btn btn-primary">Update Banner</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -280,6 +323,7 @@
     <table class="data-table">
         <thead>
             <tr>
+                <th style="width:80px;">Order</th>
                 <th>Product</th>
                 <th>Price</th>
                 <th>Sizes</th>
@@ -292,6 +336,13 @@
         <tbody>
             @foreach($products as $product)
             <tr data-product-id="{{ $product->id }}" id="product-row-{{ $product->id }}">
+                <td>
+                    <select class="form-control" style="padding:4px 8px; font-size:13px; cursor:pointer;" onchange="updateSortOrder({{ $product->id }}, this.value)">
+                        @for($i = 0; $i <= max($totalProducts, 20); $i++)
+                            <option value="{{ $i }}" {{ $product->sort_order == $i ? 'selected' : '' }}>{{ $i == 0 ? '-' : $i }}</option>
+                        @endfor
+                    </select>
+                </td>
                 <td>
                     <div class="product-cell">
                          @if($product->thumbnail)
@@ -537,41 +588,7 @@
     </div>
 </div>
 
-<!-- Edit Hero Banner Modal -->
-<div id="editHeroBannerModal" class="modal-overlay">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title">Edit Hero Banner</h2>
-            <button type="button" class="modal-close" onclick="closeModal('editHeroBannerModal')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label class="form-label">Season Label</label>
-                <input type="text" class="form-control" value="SEASON 04" id="heroBannerSeason">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Hero Title</label>
-                <input type="text" class="form-control" value="FRESH DROPS" id="heroBannerTitle">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Background Image</label>
-                <div class="image-upload-area">
-                    <input type="file" accept="image/*" style="display:none;" id="editBannerInput">
-                    <label for="editBannerInput" style="cursor:pointer;display:block;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                        <p><span>Click to upload</span> or drag and drop a new banner image</p>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeModal('editHeroBannerModal')">Cancel</button>
-            <button type="button" class="btn btn-primary" onclick="saveHeroBanner()">Save Changes</button>
-        </div>
-    </div>
-</div>
+
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteProductModal" class="modal-overlay">
@@ -764,6 +781,51 @@
         
         showToast('Hero banner updated!', 'success');
         closeModal('editHeroBannerModal');
+    }
+    function updateSortOrder(productId, newOrder) {
+        fetch('/admin/products/update-sort-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                id: productId,
+                sort_order: newOrder
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Sort order updated!', 'success');
+            } else {
+                showToast('Failed to update sort order', 'error');
+            }
+        })
+        .catch(err => {
+            showToast('Error updating sort order', 'error');
+            console.error(err);
+        });
+    }
+
+    // Sync Banner Text Color
+    const bannerColorPicker = document.getElementById('bannerColorPicker');
+    const bannerColorText = document.getElementById('bannerColorText');
+
+    if(bannerColorPicker && bannerColorText) {
+         // When color picker changes, update text input
+        bannerColorPicker.addEventListener('input', (e) => {
+            bannerColorText.value = e.target.value;
+        });
+
+        // When text input changes (e.g. manual hex entry), update color picker
+        bannerColorText.addEventListener('input', (e) => {
+             // Basic hex validation
+            const val = e.target.value;
+            if(/^#[0-9A-F]{6}$/i.test(val)) {
+                bannerColorPicker.value = val;
+            }
+        });
     }
 </script>
 @endsection

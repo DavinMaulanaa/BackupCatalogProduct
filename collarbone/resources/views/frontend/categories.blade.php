@@ -130,6 +130,91 @@
         .rotate-y-180 {
             transform: rotateY(180deg);
         }
+
+        /* ===== TikTok-Style Image Slider ===== */
+        .product-slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .product-slider-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+
+        .product-slider-track.is-dragging {
+            transition: none;
+        }
+
+        .product-slider-slide {
+            min-width: 100%;
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
+        .product-slider-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Dot Indicators */
+        .slider-dots {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(4px);
+        }
+
+        .slider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.45);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+        }
+
+        .slider-dot.active {
+            background: #ffffff;
+            transform: scale(1.3);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Slide counter (optional) */
+        .slider-counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            font-size: 11px;
+            font-weight: 500;
+            color: white;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            padding: 2px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
 
@@ -311,9 +396,24 @@
                         
                         <div class="perspective-1000 mb-4">
                             <div class="relative transition-all duration-700 transform-style-3d w-full aspect-[3/4]">
-                                <div class="absolute inset-0 backface-hidden bg-neutral-100 overflow-hidden">
-                                     <img src="{{ Str::startsWith($product->image_url, 'http') ? $product->image_url : asset($product->image_url) }}" alt="{{ $product->name }}"
-                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 border-2 border-black rounded-sm">
+                                <div class="absolute inset-0 backface-hidden bg-neutral-100 overflow-hidden border-2 border-black rounded-sm">
+                                    <div class="product-slider" data-slider>
+                                        <div class="product-slider-track">
+                                            @if(!empty($product->image_urls))
+                                                @foreach($product->image_urls as $img)
+                                                <div class="product-slider-slide">
+                                                    <img src="{{ Str::startsWith($img, 'http') ? $img : asset($img) }}" alt="{{ $product->name }}">
+                                                </div>
+                                                @endforeach
+                                            @else
+                                                <div class="product-slider-slide">
+                                                    <img src="{{ asset('img/placeholder.jpg') }}" alt="Placeholder">
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="slider-dots"></div>
+                                        <div class="slider-counter">1 / {{ is_array($product->image_urls) ? count($product->image_urls) : 0 }}</div>
+                                    </div>
                                 </div>
                                 <div
                                     class="absolute inset-0 backface-hidden rotate-y-180 bg-white border border-neutral-100 p-6 flex flex-col items-center justify-center text-center rounded-sm">
@@ -381,7 +481,7 @@
                         <div class="perspective-1000 mb-4 rounded-lg border-2 border-gray-200 p-2 bg-white">
                             <div class="relative transition-all duration-700 transform-style-3d w-full aspect-square">
                                 <div class="absolute inset-0 bg-white overflow-hidden rounded-full border border-neutral-100 shadow-sm hover:shadow-md transition-shadow">
-                                    <img src="{{ Str::startsWith($pin->image_url, 'http') ? $pin->image_url : asset($pin->image_url) }}" alt="{{ $pin->name }}"
+                                    <img src="{{ $pin->thumbnail ?? asset('img/placeholder.jpg') }}" alt="{{ $pin->name }}"
                                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 p-2">
                                 </div>
                                 <div class="absolute inset-0 backface-hidden rotate-y-180 bg-white border border-neutral-100 p-4 flex flex-col items-center justify-center text-center rounded-full shadow-sm">
@@ -416,6 +516,136 @@
 
     <!-- Scroll Animation Script -->
     <script>
+        // ===== TikTok-Style Product Slider =====
+        class ProductSlider {
+            constructor(el) {
+                this.el = el;
+                this.track = el.querySelector('.product-slider-track');
+                this.slides = el.querySelectorAll('.product-slider-slide');
+                this.dotsContainer = el.querySelector('.slider-dots');
+                this.counter = el.querySelector('.slider-counter');
+                this.currentIndex = 0;
+                this.totalSlides = this.slides.length;
+                this.isDragging = false;
+                this.startX = 0;
+                this.currentTranslate = 0;
+                this.prevTranslate = 0;
+                this.animationID = null;
+
+                if (this.totalSlides > 0) this.init();
+            }
+
+            init() {
+                // Create dots
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const dot = document.createElement('button');
+                    dot.classList.add('slider-dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.goToSlide(i);
+                    });
+                    this.dotsContainer.appendChild(dot);
+                }
+
+                // Touch events
+                this.el.addEventListener('touchstart', this.touchStart.bind(this), { passive: true });
+                this.el.addEventListener('touchmove', this.touchMove.bind(this), { passive: false });
+                this.el.addEventListener('touchend', this.touchEnd.bind(this));
+
+                // Mouse events (for desktop)
+                this.el.addEventListener('mousedown', this.touchStart.bind(this));
+                this.el.addEventListener('mousemove', this.touchMove.bind(this));
+                this.el.addEventListener('mouseup', this.touchEnd.bind(this));
+                this.el.addEventListener('mouseleave', () => {
+                    if (this.isDragging) this.touchEnd();
+                });
+
+                // Prevent context menu on long press
+                this.el.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+
+            getPositionX(event) {
+                return event.type.includes('mouse') ? event.pageX : event.touches[0].clientX;
+            }
+
+            touchStart(event) {
+                this.isDragging = true;
+                this.startX = this.getPositionX(event);
+                this.track.classList.add('is-dragging');
+                this.animationID = requestAnimationFrame(this.animation.bind(this));
+            }
+
+            touchMove(event) {
+                if (!this.isDragging) return;
+                const currentX = this.getPositionX(event);
+                const diff = currentX - this.startX;
+                this.currentTranslate = this.prevTranslate + diff;
+
+                // Prevent default to stop page scrolling while swiping horizontally
+                if (Math.abs(diff) > 5) {
+                    event.preventDefault();
+                }
+            }
+
+            touchEnd() {
+                this.isDragging = false;
+                cancelAnimationFrame(this.animationID);
+                this.track.classList.remove('is-dragging');
+
+                const movedBy = this.currentTranslate - this.prevTranslate;
+                const threshold = this.el.offsetWidth * 0.15; // 15% swipe threshold
+
+                if (movedBy < -threshold && this.currentIndex < this.totalSlides - 1) {
+                    this.currentIndex++;
+                } else if (movedBy > threshold && this.currentIndex > 0) {
+                    this.currentIndex--;
+                }
+
+                this.setPositionByIndex();
+                this.updateDots();
+                this.updateCounter();
+            }
+
+            animation() {
+                this.setSliderPosition();
+                if (this.isDragging) {
+                    requestAnimationFrame(this.animation.bind(this));
+                }
+            }
+
+            setSliderPosition() {
+                this.track.style.transform = `translateX(${this.currentTranslate}px)`;
+            }
+
+            setPositionByIndex() {
+                this.currentTranslate = this.currentIndex * -this.el.offsetWidth;
+                this.prevTranslate = this.currentTranslate;
+                this.track.style.transform = `translateX(${this.currentTranslate}px)`;
+            }
+
+            goToSlide(index) {
+                this.currentIndex = index;
+                this.setPositionByIndex();
+                this.updateDots();
+                this.updateCounter();
+            }
+
+            updateDots() {
+                const dots = this.dotsContainer.querySelectorAll('.slider-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentIndex);
+                });
+            }
+
+            updateCounter() {
+                if (this.counter) {
+                    this.counter.textContent = `${this.currentIndex + 1} / ${this.totalSlides}`;
+                }
+            }
+        }
+
         // Simple Intersection Observer for scroll animations
         document.addEventListener('DOMContentLoaded', () => {
             const observerOptions = {
@@ -435,6 +665,11 @@
 
             const elements = document.querySelectorAll('.reveal-on-scroll');
             elements.forEach(el => observer.observe(el));
+
+            // Initialize Sliders
+            document.querySelectorAll('[data-slider]').forEach(slider => {
+                new ProductSlider(slider);
+            });
 
             // View All Tees Button Handler
             const viewAllTeesBtn = document.getElementById('viewAllTeesBtn');

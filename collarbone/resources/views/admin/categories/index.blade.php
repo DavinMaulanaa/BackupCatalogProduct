@@ -251,6 +251,7 @@
         <table class="data-table">
             <thead>
                 <tr>
+                    <th style="width:70px;">Order</th>
                     <th>Product</th>
                     <th>Price</th>
                     <th>Stock</th>
@@ -261,6 +262,13 @@
             <tbody>
                 @foreach($category->products as $product)
                 <tr id="cat-product-row-{{ $product->id }}">
+                    <td>
+                        <select class="form-control" style="padding:2px 6px; font-size:12px; cursor:pointer;" onchange="updateSortOrder({{ $product->id }}, this.value)">
+                            @for($i = 0; $i <= max($totalProducts, 20); $i++)
+                                <option value="{{ $i }}" {{ $product->sort_order == $i ? 'selected' : '' }}>{{ $i == 0 ? '-' : $i }}</option>
+                            @endfor
+                        </select>
+                    </td>
                     <td>
                         <div class="product-cell">
                              @if($product->thumbnail)
@@ -338,6 +346,10 @@
                     <div class="form-group">
                         <label class="form-label">Category Name *</label>
                         <input type="text" name="name" class="form-control" placeholder="e.g. Hoodies" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subtitle (e.g. 01. PRODUCT)</label>
+                        <input type="text" name="subtitle" class="form-control" placeholder="e.g. 01. PRODUCT">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Description</label>
@@ -545,6 +557,35 @@
             toast.style.transition = 'all 0.3s ease';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
+    }
+    
+    function updateSortOrder(productId, newOrder) {
+        // Get CSRF token
+        const csrfToken = document.querySelector('input[name="_token"]')?.value || document.head.querySelector('meta[name="csrf-token"]')?.content;
+
+        fetch('/admin/products/update-sort-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                id: productId,
+                sort_order: newOrder
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Product order updated!', 'success');
+            } else {
+                showToast('Failed to update product order', 'error');
+            }
+        })
+        .catch(err => {
+            showToast('Error updating product order', 'error');
+            console.error(err);
+        });
     }
 </script>
 @endsection

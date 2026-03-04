@@ -149,22 +149,46 @@
 
 @section('scripts')
 <script>
-function previewImages(input) {
-    const grid = document.getElementById('imagePreviewGrid');
-    Array.from(input.files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const item = document.createElement('div');
-            item.className = 'image-preview-item';
-            item.innerHTML = `
-                <img src="${e.target.result}" alt="Preview">
-                <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>
-            `;
-            grid.appendChild(item);
-        };
-        reader.readAsDataURL(file);
-    });
-}
+    let uploadedFiles = [];
+
+    function previewImages(input) {
+        const grid = document.getElementById('imagePreviewGrid');
+        const newFiles = Array.from(input.files);
+        
+        newFiles.forEach(file => {
+            // Avoid duplicates
+            if(uploadedFiles.some(f => f.name === file.name && f.size === file.size)) return;
+            
+            // Assign unique ID for removal
+            file.uniqueId = Math.random().toString(36).substring(7);
+            uploadedFiles.push(file);
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const item = document.createElement('div');
+                item.className = 'image-preview-item';
+                item.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <button type="button" class="remove-btn" onclick="removeNewFile('${file.uniqueId}', this)">×</button>
+                `;
+                grid.appendChild(item);
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        updateInputFiles(input);
+    }
+
+    function removeNewFile(id, btn) {
+        uploadedFiles = uploadedFiles.filter(f => f.uniqueId !== id);
+        btn.parentElement.remove();
+        updateInputFiles(document.getElementById('imageInput'));
+    }
+
+    function updateInputFiles(input) {
+        const dt = new DataTransfer();
+        uploadedFiles.forEach(file => dt.items.add(file));
+        input.files = dt.files;
+    }
 </script>
 @endsection
