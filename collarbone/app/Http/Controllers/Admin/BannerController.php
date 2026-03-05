@@ -22,9 +22,9 @@ class BannerController extends Controller
             'image_url_type' => 'nullable|in:file,url',
             'image_url' => 'nullable|url',
         ]);
-
+        
         $banner = Banner::where('page_name', $page_name)->firstOrFail();
-
+        
         // Handle Image Upload or URL
         if ($request->hasFile('image_path')) {
             // Delete old image if it exists in storage (not if it's a seed or url)

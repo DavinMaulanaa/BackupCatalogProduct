@@ -413,7 +413,7 @@
                 Showing {{ $products->firstItem() }} - {{ $products->lastItem() }} of {{ $products->total() }}
             </div>
             <div class="pagination">
-                {{ $products->appends(request()->query())->links() }}
+                {{ $products->appends(request()->query())->links('vendor.pagination.custom-admin') }}
             </div>
         </div>
     @endif

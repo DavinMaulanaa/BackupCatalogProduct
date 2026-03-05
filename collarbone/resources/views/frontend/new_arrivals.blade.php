@@ -256,7 +256,30 @@
       border-radius: 10px;
       letter-spacing: 0.05em;
     }
-  </style>
+
+        /* ===== Checkout Modal ===== */
+        #checkoutModal { transition: opacity 0.3s ease; }
+        #checkoutModal.hidden { display: none; }
+        #checkoutDrawer { transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+        #checkoutDrawer.translate-y-full { transform: translateY(100%); }
+        .size-option { cursor:pointer; padding:6px 14px; border:1.5px solid #d4d4d4; border-radius:4px; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; transition:all 0.2s; background:white; color:#262626; }
+        .size-option:hover, .size-option.selected { background:#262626; color:white; border-color:#262626; }
+        .color-option { cursor:pointer; width:28px; height:28px; border-radius:50%; border:2.5px solid #e5e5e5; transition:all 0.2s; }
+        .color-option:hover, .color-option.selected { border-color:#2a9d9d; transform:scale(1.15); box-shadow:0 0 0 2px white, 0 0 0 4px #2a9d9d; }
+        .qty-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border:1.5px solid #d4d4d4; border-radius:4px; cursor:pointer; font-size:16px; background:white; transition:all 0.2s; }
+        .qty-btn:hover { border-color:#262626; background:#f5f5f5; }
+
+        /* === Cart Sidebar === */
+        #cartSidebar { transition: transform 0.4s cubic-bezier(0.32,0.72,0,1); }
+        #cartSidebar.cart-open { transform: translateX(0) !important; }
+        #cartOverlay { transition: opacity 0.3s ease; }
+        #cartOverlay.cart-visible { opacity: 1; pointer-events: auto; }
+        .cart-item-img { width: 52px; height: 64px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+        .cart-qty-btn { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #d4d4d4; border-radius: 4px; cursor: pointer; font-size: 14px; background: white; transition: all 0.2s; }
+        .cart-qty-btn:hover { border-color: #262626; background: #f5f5f5; }
+        @keyframes cartBounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.4)} }
+        .cart-badge-bounce { animation: cartBounce 0.35s ease; }
+    </style>
 </head>
 
 <body class="min-h-screen flex flex-col bg-white text-black">
@@ -293,6 +316,12 @@
             class="absolute bottom-0 left-0 w-0 h-[1.5px] bg-orbis-teal transition-all duration-300 ease-out group-hover:w-full"></span>
         </a>
       </nav>
+
+      <!-- Cart Icon -->
+      <button id="cartToggleBtn" class="relative p-2 hover:bg-neutral-100 rounded-full transition-colors" aria-label="Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span id="cartBadge" class="absolute -top-1 -right-1 bg-[#2a9d9d] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+      </button>
 
       <!-- Mobile Menu Toggle -->
       <button id="menuToggle" class="lg:hidden group p-2 hover:bg-neutral-100 rounded-full transition-colors">
@@ -445,7 +474,7 @@
                     @endforeach
                   </div>
                 </div>
-                <div class="flex flex-col items-end gap-2">
+                  <div class="flex flex-col items-end gap-2">
                   <div class="flex gap-1">
                      @foreach($product->colors ?? [] as $color)
                         <span class="w-3 h-3 rounded-full border border-neutral-200" 
@@ -453,7 +482,26 @@
                               title="{{ $color }}"></span>
                      @endforeach
                   </div>
-                  <button class="details-btn uppercase tracking-widest px-3 py-1.5 border border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium">Details</button>
+                  <div class="flex gap-1">
+                    <button class="details-btn uppercase tracking-widest px-2 py-1.5 border border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium">Details</button>
+                    <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
+                        data-name="{{ $product->name }}"
+                        data-price="{{ (int)$product->price }}"
+                        data-sizes='@json($product->sizes ?? [])'
+                        data-colors='@json($product->colors ?? [])'
+                        data-image="{{ $product->thumbnail ?? asset('img/placeholder.jpg') }}"
+                        title="Add to Cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    </button>
+                    <button
+                        class="order-btn uppercase tracking-widest px-2 py-1.5 border border-[#2a9d9d] bg-[#2a9d9d] hover:bg-[#1a6b6b] text-white transition-all duration-300 rounded-sm text-[10px] font-medium"
+                        data-name="{{ $product->name }}"
+                        data-price="{{ number_format($product->price, 0, ',', '.') }}"
+                        data-sizes='@json($product->sizes ?? [])'
+                        data-colors='@json($product->colors ?? [])'
+                        data-image="{{ $product->thumbnail ?? asset('img/placeholder.jpg') }}"
+                    >Order</button>
+                  </div>
                 </div>
               </div>
             </article>
@@ -663,6 +711,186 @@
         }
       });
     });
+  </script>
+
+  <!-- Cart Overlay -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] opacity-0 pointer-events-none"></div>
+  <!-- Cart Sidebar -->
+  <aside id="cartSidebar" class="fixed top-0 right-0 h-full w-full max-w-sm bg-white shadow-2xl z-[160] flex flex-col" style="transform: translateX(100%)">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-100">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <h2 class="text-sm font-semibold tracking-widest uppercase">Cart</h2>
+        <span id="cartItemCount" class="text-xs text-neutral-400"></span>
+      </div>
+      <button id="closeCartBtn" class="p-2 hover:bg-neutral-100 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+    <div id="cartItemsContainer" class="flex-1 overflow-y-auto px-5 py-4 space-y-4"></div>
+    <div id="cartEmptyState" class="hidden flex-1 flex flex-col items-center justify-center text-center px-6 py-12">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4d4d4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="mb-4"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <p class="text-sm text-neutral-400 tracking-wide">Your cart is empty.</p>
+    </div>
+    <div id="cartFooter" class="border-t border-neutral-100 px-5 py-5">
+      <div class="flex items-center justify-between mb-4"><span class="text-xs text-neutral-500 uppercase tracking-widest">Total</span><span id="cartTotal" class="text-base font-semibold text-neutral-900">IDR 0</span></div>
+      <button id="cartCheckoutBtn" class="w-full flex items-center justify-center gap-2 py-3.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-medium tracking-widest uppercase text-xs rounded-xl transition-all duration-300 shadow-md mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.484 2 12.017c0 1.99.522 3.861 1.438 5.479L2.05 21.87a.5.5 0 0 0 .611.61l4.474-1.369A9.953 9.953 0 0 0 12 22c5.522 0 10-4.484 10-10.017C22 6.483 17.522 2 11.999 2z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
+        Checkout via WhatsApp
+      </button>
+      <button id="clearCartBtn" class="w-full py-2.5 text-xs text-neutral-400 hover:text-red-500 tracking-widest uppercase transition-colors">Clear Cart</button>
+    </div>
+  </aside>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+      <div id="checkoutBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div id="checkoutDrawer" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl translate-y-full max-h-[92vh] overflow-y-auto">
+          <div class="flex justify-center pt-3 pb-1"><div class="w-10 h-1 bg-neutral-200 rounded-full"></div></div>
+          <div class="px-6 pt-4 pb-8">
+              <div class="flex items-start justify-between mb-6">
+                  <div class="flex gap-4 items-start">
+                      <img id="modalProductImg" src="" alt="" class="w-16 h-20 object-cover rounded-lg border border-neutral-100">
+                      <div>
+                          <p id="modalModeLabel" class="text-[10px] tracking-widest text-neutral-400 uppercase mb-1">SELECT OPTIONS</p>
+                          <h3 id="checkoutModalTitle" class="text-sm font-semibold text-neutral-900 leading-snug"></h3>
+                          <p id="modalProductPrice" class="text-sm font-medium text-[#2a9d9d] mt-1"></p>
+                      </div>
+                  </div>
+                  <button id="closeCheckoutModal" class="p-2 hover:bg-neutral-100 rounded-full transition-colors flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+              </div>
+              <div id="sizeSection" class="mb-6">
+                  <p class="text-[10px] tracking-widest text-neutral-500 uppercase mb-3">Select Size</p>
+                  <div id="sizeOptions" class="flex flex-wrap gap-2"></div>
+              </div>
+              <div id="colorSection" class="mb-6">
+                  <p class="text-[10px] tracking-widest text-neutral-500 uppercase mb-3">Select Color &mdash; <span id="selectedColorName" class="text-neutral-700"></span></p>
+                  <div id="colorOptions" class="flex flex-wrap gap-3"></div>
+              </div>
+              <div class="mb-8">
+                  <p class="text-[10px] tracking-widest text-neutral-500 uppercase mb-3">Quantity</p>
+                  <div class="flex items-center gap-4">
+                      <button id="qtyMinus" class="qty-btn">&minus;</button>
+                      <span id="qtyValue" class="text-sm font-semibold w-6 text-center">1</span>
+                      <button id="qtyPlus" class="qty-btn">+</button>
+                      <span class="text-xs text-neutral-400 ml-2" id="modalTotalPrice"></span>
+                  </div>
+              </div>
+              <button id="addToCartFromModal" class="w-full flex items-center justify-center gap-3 py-4 bg-neutral-900 hover:bg-neutral-700 text-white font-medium tracking-widest uppercase text-sm rounded-xl transition-all duration-300 shadow-md mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  Add to Cart
+              </button>
+              <button id="checkoutWhatsapp" class="w-full flex items-center justify-center gap-3 py-4 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-medium tracking-widest uppercase text-sm rounded-xl transition-all duration-300 shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.484 2 12.017c0 1.99.522 3.861 1.438 5.479L2.05 21.87a.5.5 0 0 0 .611.61l4.474-1.369A9.953 9.953 0 0 0 12 22c5.522 0 10-4.484 10-10.017C22 6.483 17.522 2 11.999 2z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
+                  Order via WhatsApp
+              </button>
+              <p class="text-center text-[10px] text-neutral-400 mt-3 tracking-wide">Pilih <strong>Add to Cart</strong> untuk simpan, atau <strong>Order</strong> untuk langsung ke WhatsApp.</p>
+          </div>
+      </div>
+  </div>
+
+  <!-- Checkout Script -->
+  <script>
+    const WHATSAPP_NUMBER = '6288802612864'; // ← GANTI dengan nomer WA toko
+    const colorHexMap = { 'black':'#000000','white':'#ffffff','grey':'#808080','cream':'#E5D0B1','navy':'#000080','olive':'#808000','blue':'#0000ff','charcoal':'#36454F','green':'#4CAF50','red':'#ef4444','yellow':'#EAB308','purple':'#9333EA','pink':'#EC4899','brown':'#92400E' };
+    let checkoutData = { name:'', price:0, sizes:[], colors:[], image:'' };
+    let selectedSize = '', selectedColor = '', quantity = 1;
+    const modal = document.getElementById('checkoutModal');
+    const drawer = document.getElementById('checkoutDrawer');
+
+    function openCheckoutModal(btn) {
+        checkoutData = { name: btn.dataset.name, price: parseInt(btn.dataset.price.replace(/\./g,'').replace(/,/g,'')), sizes: JSON.parse(btn.dataset.sizes||'[]'), colors: JSON.parse(btn.dataset.colors||'[]'), image: btn.dataset.image };
+        selectedSize = ''; selectedColor = ''; quantity = 1;
+        document.getElementById('checkoutModalTitle').textContent = checkoutData.name;
+        document.getElementById('modalProductImg').src = checkoutData.image;
+        document.getElementById('modalProductPrice').textContent = 'IDR ' + checkoutData.price.toLocaleString('id-ID');
+        document.getElementById('qtyValue').textContent = '1';
+        updateTotalPrice();
+        const sizeSection = document.getElementById('sizeSection'), sizeOptions = document.getElementById('sizeOptions');
+        sizeOptions.innerHTML = '';
+        if (checkoutData.sizes.length > 0) { sizeSection.classList.remove('hidden'); checkoutData.sizes.forEach(size => { const b=document.createElement('button'); b.className='size-option'; b.textContent=size; b.addEventListener('click',()=>{ document.querySelectorAll('.size-option').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); selectedSize=size; }); sizeOptions.appendChild(b); }); } else sizeSection.classList.add('hidden');
+        const colorSection = document.getElementById('colorSection'), colorOptions = document.getElementById('colorOptions');
+        colorOptions.innerHTML = ''; document.getElementById('selectedColorName').textContent = '';
+        if (checkoutData.colors.length > 0) { colorSection.classList.remove('hidden'); checkoutData.colors.forEach(color => { const hex=colorHexMap[color.toLowerCase()]||color; const s=document.createElement('button'); s.className='color-option'; s.style.backgroundColor=hex; s.title=color; if(color.toLowerCase()==='white') s.style.border='2.5px solid #d4d4d4'; s.addEventListener('click',()=>{ document.querySelectorAll('.color-option').forEach(x=>x.classList.remove('selected')); s.classList.add('selected'); selectedColor=color; document.getElementById('selectedColorName').textContent=color; }); colorOptions.appendChild(s); }); } else colorSection.classList.add('hidden');
+        modal.classList.remove('hidden'); requestAnimationFrame(()=>requestAnimationFrame(()=>drawer.classList.remove('translate-y-full')));
+        document.body.style.overflow = 'hidden';
+    }
+    function closeCheckoutModal() { drawer.classList.add('translate-y-full'); setTimeout(()=>{ modal.classList.add('hidden'); document.body.style.overflow=''; }, 400); }
+    function updateTotalPrice() { document.getElementById('modalTotalPrice').textContent = 'Total: IDR ' + (checkoutData.price*quantity).toLocaleString('id-ID'); }
+    document.getElementById('qtyMinus').addEventListener('click',()=>{ if(quantity>1){ quantity--; document.getElementById('qtyValue').textContent=quantity; updateTotalPrice(); } });
+    document.getElementById('qtyPlus').addEventListener('click',()=>{ quantity++; document.getElementById('qtyValue').textContent=quantity; updateTotalPrice(); });
+    document.getElementById('closeCheckoutModal').addEventListener('click', closeCheckoutModal);
+    document.getElementById('checkoutBackdrop').addEventListener('click', closeCheckoutModal);
+    document.getElementById('checkoutWhatsapp').addEventListener('click',()=>{
+        if (checkoutData.sizes.length>0&&!selectedSize){ alert('Silakan pilih ukuran / Please select a size.'); return; }
+        if (checkoutData.colors.length>0&&!selectedColor){ alert('Silakan pilih warna / Please select a color.'); return; }
+        const total=checkoutData.price*quantity;
+        let msg=`Halo Collarbone! Saya ingin memesan:\n\n📦 *Produk:* ${checkoutData.name}\n`;
+        if(selectedSize) msg+=`📐 *Ukuran:* ${selectedSize}\n`;
+        if(selectedColor) msg+=`🎨 *Warna:* ${selectedColor}\n`;
+        msg+=`🔢 *Qty:* ${quantity}\n💰 *Total:* IDR ${total.toLocaleString('id-ID')}\n\nMohon informasi ketersediaan dan cara pembayaran. Terima kasih! 🙏`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
+    });
+    document.addEventListener('click',(e)=>{ 
+      const btn=e.target.closest('.order-btn'); if(btn){ e.stopPropagation(); openCheckoutModal(btn); }
+      const cartBtn=e.target.closest('.cart-quick-btn');
+      if(cartBtn){ e.stopPropagation(); openCheckoutModal(cartBtn); }
+    });
+
+    // Add to Cart from modal
+    document.getElementById('addToCartFromModal').addEventListener('click', () => {
+        if (checkoutData.sizes.length>0&&!selectedSize){ alert('Silakan pilih ukuran / Please select a size.'); return; }
+        if (checkoutData.colors.length>0&&!selectedColor){ alert('Silakan pilih warna / Please select a color.'); return; }
+        cartAddItem({ name:checkoutData.name, price:checkoutData.price, size:selectedSize, color:selectedColor, image:checkoutData.image, qty:quantity });
+        closeCheckoutModal();
+        setTimeout(()=>{
+            document.getElementById('cartSidebar').classList.add('cart-open');
+            document.getElementById('cartOverlay').classList.add('cart-visible');
+            document.body.style.overflow='hidden';
+        }, 450);
+    });
+  </script>
+
+  <!-- Cart System JS -->
+  <script>
+  (function(){
+    const WA_NUMBER='6288802612864'; // ← GANTI nomer WA toko
+    const CART_KEY='collarbone_cart';
+    function loadCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY))||[]; }catch(e){return[];} }
+    function saveCart(c){ localStorage.setItem(CART_KEY,JSON.stringify(c)); }
+    function cKey(i){ return i.name+'|'+(i.size||'')+'|'+(i.color||''); }
+    window.cartAddItem=function(item){ const cart=loadCart(),key=cKey(item),ex=cart.find(c=>cKey(c)===key); if(ex){ex.qty+=(item.qty||1);}else{cart.push({...item,qty:item.qty||1});} saveCart(cart);renderCart(); const b=document.getElementById('cartBadge');if(b){b.classList.add('cart-badge-bounce');setTimeout(()=>b.classList.remove('cart-badge-bounce'),400);} };
+    window.cartChangeQty=function(idx,delta){const cart=loadCart();if(!cart[idx])return;cart[idx].qty=Math.max(1,cart[idx].qty+delta);saveCart(cart);renderCart();};
+    window.cartRemove=function(idx){const cart=loadCart();cart.splice(idx,1);saveCart(cart);renderCart();};
+    function renderCart(){
+      const cart=loadCart(),container=document.getElementById('cartItemsContainer'),empty=document.getElementById('cartEmptyState'),footer=document.getElementById('cartFooter'),badge=document.getElementById('cartBadge'),countEl=document.getElementById('cartItemCount');
+      if(!container)return;
+      const totalQty=cart.reduce((s,c)=>s+c.qty,0),totalAmt=cart.reduce((s,c)=>s+(c.price*c.qty),0);
+      if(badge){if(totalQty>0){badge.textContent=totalQty>99?'99+':totalQty;badge.classList.remove('hidden');}else badge.classList.add('hidden');}
+      if(countEl) countEl.textContent=totalQty>0?`(${totalQty} item${totalQty>1?'s':''})`:''; 
+      const totalEl=document.getElementById('cartTotal');if(totalEl)totalEl.textContent='IDR '+totalAmt.toLocaleString('id-ID');
+      if(cart.length===0){container.classList.add('hidden');container.innerHTML='';if(empty)empty.classList.remove('hidden');if(footer)footer.classList.add('hidden');return;}
+      if(empty)empty.classList.add('hidden');if(footer)footer.classList.remove('hidden');container.classList.remove('hidden');
+      container.innerHTML=cart.map((item,idx)=>`<div class="flex gap-3 items-start border-b border-neutral-50 pb-4"><img src="${item.image}" alt="${item.name}" class="cart-item-img border border-neutral-100"><div class="flex-1 min-w-0"><p class="text-xs font-semibold text-neutral-900 leading-tight mb-0.5 truncate">${item.name}</p>${item.size?`<p class="text-[10px] text-neutral-400">Size: ${item.size}</p>`:''} ${item.color?`<p class="text-[10px] text-neutral-400">Color: ${item.color}</p>`:''}<p class="text-xs font-medium text-[#2a9d9d] mt-1">IDR ${item.price.toLocaleString('id-ID')}</p><div class="flex items-center gap-2 mt-2"><button class="cart-qty-btn" onclick="cartChangeQty(${idx},-1)">−</button><span class="text-xs font-semibold w-4 text-center">${item.qty}</span><button class="cart-qty-btn" onclick="cartChangeQty(${idx},1)">+</button><button class="ml-2 text-[10px] text-red-400 hover:text-red-600 uppercase transition-colors" onclick="cartRemove(${idx})">Remove</button></div></div></div>`).join('');
+    }
+    function openCart(){document.getElementById('cartSidebar').classList.add('cart-open');document.getElementById('cartOverlay').classList.add('cart-visible');document.body.style.overflow='hidden';}
+    function closeCart(){document.getElementById('cartSidebar').classList.remove('cart-open');document.getElementById('cartOverlay').classList.remove('cart-visible');document.body.style.overflow='';}
+    document.addEventListener('DOMContentLoaded',function(){
+      renderCart();
+      document.getElementById('cartToggleBtn')?.addEventListener('click',openCart);
+      document.getElementById('closeCartBtn')?.addEventListener('click',closeCart);
+      document.getElementById('cartOverlay')?.addEventListener('click',closeCart);
+      document.getElementById('clearCartBtn')?.addEventListener('click',()=>{saveCart([]);renderCart();});
+      document.getElementById('cartCheckoutBtn')?.addEventListener('click',()=>{
+        const cart=loadCart();if(!cart.length){alert('Keranjang masih kosong!');return;}
+        const total=cart.reduce((s,c)=>s+c.price*c.qty,0);
+        let msg='Halo Collarbone! Saya ingin memesan:\n\n';
+        cart.forEach((item,i)=>{msg+=`${i+1}. *${item.name}*`;if(item.size)msg+=` | Size: ${item.size}`;if(item.color)msg+=` | Color: ${item.color}`;msg+=` | Qty: ${item.qty} | IDR ${(item.price*item.qty).toLocaleString('id-ID')}\n`;});
+        msg+=`\n💰 *Total: IDR ${total.toLocaleString('id-ID')}*\n\nMohon informasi ketersediaan dan cara pembayaran. Terima kasih! 🙏`;
+        window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
+      });
+    });
+  })();
   </script>
 
 </body>

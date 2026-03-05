@@ -128,6 +128,17 @@
     .slide.active img {
       transform: scale(1.1);
     }
+    /* Checkout Modal */
+    #checkoutModal { transition: opacity 0.3s ease; }
+    #checkoutModal.hidden { display: none; }
+    #checkoutDrawer { transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+    #checkoutDrawer.translate-y-full { transform: translateY(100%); }
+    .size-option { cursor:pointer; padding:6px 14px; border:1.5px solid #d4d4d4; border-radius:4px; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; transition:all 0.2s; background:white; color:#262626; }
+    .size-option:hover, .size-option.selected { background:#262626; color:white; border-color:#262626; }
+    .color-option { cursor:pointer; width:28px; height:28px; border-radius:50%; border:2.5px solid #e5e5e5; transition:all 0.2s; }
+    .color-option:hover, .color-option.selected { border-color:#2a9d9d; transform:scale(1.15); box-shadow:0 0 0 2px white, 0 0 0 4px #2a9d9d; }
+    .qty-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border:1.5px solid #d4d4d4; border-radius:4px; cursor:pointer; font-size:16px; background:white; transition:all 0.2s; }
+    .qty-btn:hover { border-color:#262626; background:#f5f5f5; }
 </style>
 @endpush
 
@@ -204,55 +215,101 @@
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         <!-- Product 1 -->
-        <a href="#" class="group reveal delay-100 block">
-          <div
-            class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
+        <article class="group reveal delay-100">
+          <div class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
             <img src="{{ asset('img/2_DEPAN.png') }}" alt="Graphic Tee"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ">
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
           </div>
           <p class="text-[10px] tracking-orbis text-neutral-500 mb-1">T-SHIRTS</p>
-          <h3 class="text-sm font-medium text-neutral-900 mb-1 group-hover:text-orbis-teal transition-colors">Straight
-            Edge - Black
-            Edition</h3>
-          <p class="text-sm font-medium text-neutral-900">IDR 180,000</p>
-        </a>
+          <h3 class="text-sm font-medium text-neutral-900 mb-1">Straight Edge - Black Edition</h3>
+          <div class="flex items-center justify-between mt-1 gap-1">
+            <p class="text-sm font-medium text-neutral-900">IDR 180,000</p>
+            <div class="flex gap-1">
+              <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
+                data-name="Straight Edge - Black Edition" data-price="180000"
+                data-sizes='["S","M","L","XL"]' data-colors='["Black"]'
+                data-image="{{ asset('img/2_DEPAN.png') }}" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+              <button class="order-btn uppercase tracking-widest px-2 py-1.5 border border-[#2a9d9d] bg-[#2a9d9d] hover:bg-[#1a6b6b] text-white transition-all duration-300 rounded-sm text-[10px] font-medium"
+                data-name="Straight Edge - Black Edition" data-price="180.000"
+                data-sizes='["S","M","L","XL"]' data-colors='["Black"]'
+                data-image="{{ asset('img/2_DEPAN.png') }}">Order</button>
+            </div>
+          </div>
+        </article>
         <!-- Product 2 -->
-        <a href="#" class="group reveal delay-200 block">
-          <div
-            class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
+        <article class="group reveal delay-200">
+          <div class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
             <img src="{{ asset('img/3_DEPAN.png') }}" alt="Essential Hoodie"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
           </div>
           <p class="text-[10px] tracking-orbis text-neutral-500 mb-1">T-SHIRTS</p>
-          <h3 class="text-sm font-medium text-neutral-900 mb-1 group-hover:text-orbis-teal transition-colors">Straight
-            Edge - Green
-            Edition</h3>
-          <p class="text-sm font-medium text-neutral-900">IDR 850,000</p>
-        </a>
+          <h3 class="text-sm font-medium text-neutral-900 mb-1">Straight Edge - Green Edition</h3>
+          <div class="flex items-center justify-between mt-1 gap-1">
+            <p class="text-sm font-medium text-neutral-900">IDR 850,000</p>
+            <div class="flex gap-1">
+              <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
+                data-name="Straight Edge - Green Edition" data-price="850000"
+                data-sizes='["S","M","L","XL"]' data-colors='["Green"]'
+                data-image="{{ asset('img/3_DEPAN.png') }}" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+              <button class="order-btn uppercase tracking-widest px-2 py-1.5 border border-[#2a9d9d] bg-[#2a9d9d] hover:bg-[#1a6b6b] text-white transition-all duration-300 rounded-sm text-[10px] font-medium"
+                data-name="Straight Edge - Green Edition" data-price="850.000"
+                data-sizes='["S","M","L","XL"]' data-colors='["Green"]'
+                data-image="{{ asset('img/3_DEPAN.png') }}">Order</button>
+            </div>
+          </div>
+        </article>
         <!-- Product 3 -->
-        <a href="#" class="group reveal delay-300 block">
-          <div
-            class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
+        <article class="group reveal delay-300">
+          <div class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
             <img src="{{ asset('img/5_DEPAN.png') }}" alt="Vintage Cap"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
           </div>
           <p class="text-[10px] tracking-orbis text-neutral-500 mb-1">T-SHIRTS</p>
-          <h3 class="text-sm font-medium text-neutral-900 mb-1 group-hover:text-orbis-teal transition-colors">Adalah
-            Pokonya</h3>
-          <p class="text-sm font-medium text-neutral-900">IDR 320,000</p>
-        </a>
+          <h3 class="text-sm font-medium text-neutral-900 mb-1">Adalah Pokonya</h3>
+          <div class="flex items-center justify-between mt-1 gap-1">
+            <p class="text-sm font-medium text-neutral-900">IDR 320,000</p>
+            <div class="flex gap-1">
+              <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
+                data-name="Adalah Pokonya" data-price="320000"
+                data-sizes='["S","M","L","XL"]' data-colors='["Black","White"]'
+                data-image="{{ asset('img/5_DEPAN.png') }}" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+              <button class="order-btn uppercase tracking-widest px-2 py-1.5 border border-[#2a9d9d] bg-[#2a9d9d] hover:bg-[#1a6b6b] text-white transition-all duration-300 rounded-sm text-[10px] font-medium"
+                data-name="Adalah Pokonya" data-price="320.000"
+                data-sizes='["S","M","L","XL"]' data-colors='["Black","White"]'
+                data-image="{{ asset('img/5_DEPAN.png') }}">Order</button>
+            </div>
+          </div>
+        </article>
         <!-- Product 4 -->
-        <a href="#" class="group reveal delay-100 block">
-          <div
-            class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
+        <article class="group reveal delay-100">
+          <div class="aspect-square overflow-hidden mb-4 rounded-sm bg-neutral-100 relative shadow-sm group-hover:shadow-md transition-all duration-300 border-2 border-black">
             <img src="{{ asset('img/Merch-3.jpeg') }}" alt="Oversized Tee"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
           </div>
           <p class="text-[10px] tracking-orbis text-neutral-500 mb-1">Pin Button</p>
-          <h3 class="text-sm font-medium text-neutral-900 mb-1 group-hover:text-orbis-teal transition-colors">Bundling
-            Pin Button</h3>
-          <p class="text-sm font-medium text-neutral-900">IDR 20,000</p>
-        </a>
+          <h3 class="text-sm font-medium text-neutral-900 mb-1">Bundling Pin Button</h3>
+          <div class="flex items-center justify-between mt-1 gap-1">
+            <p class="text-sm font-medium text-neutral-900">IDR 20,000</p>
+            <div class="flex gap-1">
+              <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
+                data-name="Bundling Pin Button" data-price="20000"
+                data-sizes='[]' data-colors='[]'
+                data-image="{{ asset('img/Merch-3.jpeg') }}" title="Add to Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </button>
+              <button class="order-btn uppercase tracking-widest px-2 py-1.5 border border-[#2a9d9d] bg-[#2a9d9d] hover:bg-[#1a6b6b] text-white transition-all duration-300 rounded-sm text-[10px] font-medium"
+                data-name="Bundling Pin Button" data-price="20.000"
+                data-sizes='[]' data-colors='[]'
+                data-image="{{ asset('img/Merch-3.jpeg') }}">Order</button>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -313,6 +370,7 @@
         <div class="flex w-max animate-marquee hover:[animation-play-state:paused] items-stretch">
           <!-- Original Cards -->
           <div class="flex gap-6 mx-3">
+            @for($i = 0; $i < 5; $i++)
             @foreach($testimonials as $testimonial)
             <div class="bg-white p-8 rounded-2xl shadow-sm w-[400px] flex-shrink-0 flex flex-col justify-between transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-default">
               <div>
@@ -331,10 +389,12 @@
               </div>
             </div>
             @endforeach
+            @endfor
           </div>
 
           <!-- Duplicate Cards (for seamless marquee loop) -->
           <div class="flex gap-6 mx-3" aria-hidden="true">
+            @for($i = 0; $i < 5; $i++)
             @foreach($testimonials as $testimonial)
             <div class="bg-white p-8 rounded-2xl shadow-sm w-[400px] flex-shrink-0 flex flex-col justify-between transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-default">
               <div>
@@ -353,11 +413,62 @@
               </div>
             </div>
             @endforeach
+            @endfor
           </div>
         </div>
       </div>
     </section>
 </main>
+
+<!-- Checkout Modal -->
+<div id="checkoutModal" class="fixed inset-0 z-[200] hidden" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+    <div id="checkoutBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div id="checkoutDrawer" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl translate-y-full max-h-[92vh] overflow-y-auto">
+        <div class="flex justify-center pt-3 pb-1"><div class="w-10 h-1 bg-neutral-200 rounded-full"></div></div>
+        <div class="px-6 pt-4 pb-10">
+            <div class="flex items-start justify-between mb-6">
+                <div class="flex gap-4 items-start">
+                    <img id="modalProductImg" src="" alt="" class="w-16 h-20 object-cover rounded-lg border border-neutral-100">
+                    <div>
+                        <p id="modalModeLabel" class="text-[10px] tracking-widest text-neutral-400 uppercase mb-1">SELECT OPTIONS</p>
+                        <h3 id="checkoutModalTitle" class="text-sm font-semibold text-neutral-900 leading-snug"></h3>
+                        <p id="modalProductPrice" class="text-sm font-medium text-[#2a9d9d] mt-1"></p>
+                    </div>
+                </div>
+                <button id="closeCheckoutModal" class="p-2 hover:bg-neutral-100 rounded-full transition-colors flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div id="sizeSection" class="mb-6">
+                <p class="text-[10px] tracking-widest text-neutral-500 uppercase mb-3">Select Size</p>
+                <div id="sizeOptions" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div id="colorSection" class="mb-6">
+                <p class="text-[10px] tracking-widest text-neutral-500 uppercase mb-3">Select Color &mdash; <span id="selectedColorName" class="text-neutral-700"></span></p>
+                <div id="colorOptions" class="flex flex-wrap gap-3"></div>
+            </div>
+            <div class="mb-8">
+                <p class="text-[10px] tracking-widest text-neutral-500 uppercase mb-3">Quantity</p>
+                <div class="flex items-center gap-4">
+                    <button id="qtyMinus" class="qty-btn">&minus;</button>
+                    <span id="qtyValue" class="text-sm font-semibold w-6 text-center">1</span>
+                    <button id="qtyPlus" class="qty-btn">+</button>
+                    <span class="text-xs text-neutral-400 ml-2" id="modalTotalPrice"></span>
+                </div>
+            </div>
+            <button id="addToCartFromModal" class="w-full flex items-center justify-center gap-3 py-4 bg-neutral-900 hover:bg-neutral-700 text-white font-medium tracking-widest uppercase text-sm rounded-xl transition-all duration-300 shadow-md mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                Add to Cart
+            </button>
+            <button id="checkoutWhatsapp" class="w-full flex items-center justify-center gap-3 py-4 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-medium tracking-widest uppercase text-sm rounded-xl transition-all duration-300 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.484 2 12.017c0 1.99.522 3.861 1.438 5.479L2.05 21.87a.5.5 0 0 0 .611.61l4.474-1.369A9.953 9.953 0 0 0 12 22c5.522 0 10-4.484 10-10.017C22 6.483 17.522 2 11.999 2z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
+                Order via WhatsApp
+            </button>
+            <p class="text-center text-[10px] text-neutral-400 mt-3 tracking-wide">Pilih <strong>Add to Cart</strong> untuk simpan, atau <strong>Order</strong> untuk langsung ke WhatsApp.</p>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -445,5 +556,123 @@
     setInterval(() => {
       goToSlide((currentSlide + 1) % slides.length);
     }, 5000);
+</script>
+
+<script>
+    const WHATSAPP_NUMBER = '6288802612864'; // ← GANTI dengan nomer WA toko
+    const colorHexMap = { 'black':'#000000','white':'#ffffff','grey':'#808080','cream':'#E5D0B1','navy':'#000080','olive':'#808000','blue':'#0000ff','charcoal':'#36454F','green':'#4CAF50','red':'#ef4444','yellow':'#EAB308','purple':'#9333EA','pink':'#EC4899','brown':'#92400E' };
+    let checkoutData = { name:'', price:0, sizes:[], colors:[], image:'' };
+    let selectedSize = '', selectedColor = '', quantity = 1;
+    const modal = document.getElementById('checkoutModal');
+    const drawer = document.getElementById('checkoutDrawer');
+
+    function openCheckoutModal(btn) {
+        // Parse price: remove dots used as thousands separators
+        const rawPrice = btn.dataset.price.replace(/\./g, '').replace(/,/g, '.');
+        checkoutData = {
+            name: btn.dataset.name,
+            price: parseFloat(rawPrice) || 0,
+            sizes: JSON.parse(btn.dataset.sizes || '[]'),
+            colors: JSON.parse(btn.dataset.colors || '[]'),
+            image: btn.dataset.image
+        };
+        selectedSize = ''; selectedColor = ''; quantity = 1;
+        document.getElementById('checkoutModalTitle').textContent = checkoutData.name;
+        document.getElementById('modalProductImg').src = checkoutData.image;
+        document.getElementById('modalProductPrice').textContent = 'IDR ' + checkoutData.price.toLocaleString('id-ID');
+        document.getElementById('qtyValue').textContent = '1';
+        updateTotalPrice();
+
+        const sizeSection = document.getElementById('sizeSection');
+        const sizeOptions = document.getElementById('sizeOptions');
+        sizeOptions.innerHTML = '';
+        if (checkoutData.sizes.length > 0) {
+            sizeSection.classList.remove('hidden');
+            checkoutData.sizes.forEach(size => {
+                const b = document.createElement('button');
+                b.className = 'size-option'; b.textContent = size;
+                b.addEventListener('click', () => { document.querySelectorAll('.size-option').forEach(x => x.classList.remove('selected')); b.classList.add('selected'); selectedSize = size; });
+                sizeOptions.appendChild(b);
+            });
+        } else sizeSection.classList.add('hidden');
+
+        const colorSection = document.getElementById('colorSection');
+        const colorOptions = document.getElementById('colorOptions');
+        colorOptions.innerHTML = ''; document.getElementById('selectedColorName').textContent = '';
+        if (checkoutData.colors.length > 0) {
+            colorSection.classList.remove('hidden');
+            checkoutData.colors.forEach(color => {
+                const hex = colorHexMap[color.toLowerCase()] || color;
+                const s = document.createElement('button');
+                s.className = 'color-option'; s.style.backgroundColor = hex; s.title = color;
+                if (color.toLowerCase() === 'white') s.style.border = '2.5px solid #d4d4d4';
+                s.addEventListener('click', () => { document.querySelectorAll('.color-option').forEach(x => x.classList.remove('selected')); s.classList.add('selected'); selectedColor = color; document.getElementById('selectedColorName').textContent = color; });
+                colorOptions.appendChild(s);
+            });
+        } else colorSection.classList.add('hidden');
+
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => requestAnimationFrame(() => drawer.classList.remove('translate-y-full')));
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckoutModal() {
+        drawer.classList.add('translate-y-full');
+        setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = ''; }, 400);
+    }
+
+    function updateTotalPrice() {
+        document.getElementById('modalTotalPrice').textContent = 'Total: IDR ' + (checkoutData.price * quantity).toLocaleString('id-ID');
+    }
+
+    document.getElementById('qtyMinus').addEventListener('click', () => { if (quantity > 1) { quantity--; document.getElementById('qtyValue').textContent = quantity; updateTotalPrice(); } });
+    document.getElementById('qtyPlus').addEventListener('click', () => { quantity++; document.getElementById('qtyValue').textContent = quantity; updateTotalPrice(); });
+    document.getElementById('closeCheckoutModal').addEventListener('click', closeCheckoutModal);
+    document.getElementById('checkoutBackdrop').addEventListener('click', closeCheckoutModal);
+
+    document.getElementById('checkoutWhatsapp').addEventListener('click', () => {
+        if (checkoutData.sizes.length > 0 && !selectedSize) { alert('Silakan pilih ukuran / Please select a size.'); return; }
+        if (checkoutData.colors.length > 0 && !selectedColor) { alert('Silakan pilih warna / Please select a color.'); return; }
+        const total = checkoutData.price * quantity;
+        let msg = `Halo Collarbone! Saya ingin memesan:\n\n *Produk:* ${checkoutData.name}\n`;
+        if (selectedSize) msg += ` *Ukuran:* ${selectedSize}\n`;
+        if (selectedColor) msg += ` *Warna:* ${selectedColor}\n`;
+        msg += ` *Qty:* ${quantity}\n *Total:* IDR ${total.toLocaleString('id-ID')}\n\nMohon informasi ketersediaan dan cara pembayaran. Terima kasih! 🙏`;
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.order-btn');
+        if (btn) { e.stopPropagation(); openCheckoutModal(btn); }
+
+        // Cart quick-add: open modal for size/color selection
+        const cartBtn = e.target.closest('.cart-quick-btn');
+        if (cartBtn) { e.stopPropagation(); openCheckoutModal(cartBtn); }
+    });
+
+    // Add to Cart from modal
+    document.getElementById('addToCartFromModal').addEventListener('click', () => {
+        if (checkoutData.sizes.length > 0 && !selectedSize) { alert('Silakan pilih ukuran / Please select a size.'); return; }
+        if (checkoutData.colors.length > 0 && !selectedColor) { alert('Silakan pilih warna / Please select a color.'); return; }
+        if (typeof addToCart === 'function') {
+            addToCart({
+                name:  checkoutData.name,
+                price: checkoutData.price,
+                size:  selectedSize,
+                color: selectedColor,
+                image: checkoutData.image,
+                qty:   quantity
+            });
+        }
+        closeCheckoutModal();
+        // Open cart sidebar after modal closes
+        setTimeout(() => {
+            const sidebar = document.getElementById('cartSidebar');
+            const overlay = document.getElementById('cartOverlay');
+            if (sidebar) sidebar.classList.add('cart-open');
+            if (overlay) overlay.classList.add('cart-visible');
+            document.body.style.overflow = 'hidden';
+        }, 450);
+    });
 </script>
 @endpush

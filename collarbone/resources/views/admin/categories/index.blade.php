@@ -324,7 +324,7 @@
                 Showing {{ $categories->firstItem() }} - {{ $categories->lastItem() }} of {{ $categories->total() }}
             </div>
             <div class="pagination">
-                {{ $categories->appends(request()->query())->links() }}
+                {{ $categories->appends(request()->query())->links('vendor.pagination.custom-admin') }}
             </div>
         </div>
     @endif
