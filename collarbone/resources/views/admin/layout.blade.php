@@ -1005,17 +1005,7 @@
                 </a>
             </div>
             
-            <div class="nav-section">
-                <div class="nav-section-title">Content</div>
-                 <a href="{{ route('admin.dashboard') }}" class="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                    Hero Slider
-                </a>
-                 <a href="#" class="nav-link" onclick="alert('Testimonials managed from Dashboard page')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    Testimonials
-                </a>
-            </div>
+
             <div class="nav-section">
                 <div class="nav-section-title">Lainnya</div>
                 <a href="/" class="nav-link" target="_blank">

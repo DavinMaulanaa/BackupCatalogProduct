@@ -229,16 +229,6 @@
         <div class="stat-card-value">{{ $lowStock }}</div>
         <div class="stat-card-label">Low Stock</div>
     </div>
-
-    <div class="stat-card slide-in-up stagger-4">
-        <div class="stat-card-header">
-            <div class="stat-card-icon yellow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-        </div>
-        <div class="stat-card-value">Rp {{ number_format($totalValue / 1000000, 1) }}M</div>
-        <div class="stat-card-label">Total Value</div>
-    </div>
 </div>
 
 <!-- Hero Banner Management -->
@@ -250,10 +240,10 @@
         <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
             <!-- Preview -->
             <div style="flex: 1; min-width: 300px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; position: relative;">
-                <img src="{{ $banner->image_url }}" alt="Banner Preview" style="width: 100%; height: 200px; object-fit: cover;">
-                <div style="position: absolute; inset: 0; bg-black/20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: {{ $banner->text_color }}; background: rgba(0,0,0,0.3);">
-                    <h3 style="font-size: 24px; font-weight: 300; letter-spacing: 0.15em; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $banner->title }}</h3>
-                    <p style="font-size: 12px; letter-spacing: 0.1em; max-width: 80%; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $banner->subtitle }}</p>
+                <img id="bannerPreviewImg" src="{{ $banner->image_url }}" alt="Banner Preview" style="width: 100%; height: 200px; object-fit: cover;">
+                <div id="bannerPreviewOverlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: {{ $banner->text_color }}; background: rgba(0,0,0,0.3);">
+                    <h3 id="bannerPreviewTitle" style="font-size: 24px; font-weight: 300; letter-spacing: 0.15em; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $banner->title }}</h3>
+                    <p id="bannerPreviewSubtitle" style="font-size: 12px; letter-spacing: 0.1em; max-width: 80%; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $banner->subtitle }}</p>
                 </div>
             </div>
 
@@ -813,18 +803,36 @@
     const bannerColorText = document.getElementById('bannerColorText');
 
     if(bannerColorPicker && bannerColorText) {
-         // When color picker changes, update text input
+        // When color picker changes, update text input + live preview
         bannerColorPicker.addEventListener('input', (e) => {
             bannerColorText.value = e.target.value;
+            document.getElementById('bannerPreviewOverlay').style.color = e.target.value;
         });
 
-        // When text input changes (e.g. manual hex entry), update color picker
+        // When text input changes (e.g. manual hex entry), update color picker + live preview
         bannerColorText.addEventListener('input', (e) => {
-             // Basic hex validation
             const val = e.target.value;
             if(/^#[0-9A-F]{6}$/i.test(val)) {
                 bannerColorPicker.value = val;
+                document.getElementById('bannerPreviewOverlay').style.color = val;
             }
+        });
+    }
+
+    // Live preview for Banner Title & Subtitle
+    const titleInput = document.querySelector('input[name="title"]');
+    const subtitleInput = document.querySelector('input[name="subtitle"]');
+
+    if (titleInput) {
+        titleInput.addEventListener('input', (e) => {
+            const el = document.getElementById('bannerPreviewTitle');
+            if (el) el.textContent = e.target.value;
+        });
+    }
+    if (subtitleInput) {
+        subtitleInput.addEventListener('input', (e) => {
+            const el = document.getElementById('bannerPreviewSubtitle');
+            if (el) el.textContent = e.target.value;
         });
     }
 </script>

@@ -200,7 +200,7 @@
         </a>
         @empty
         <div class="col-span-3 text-center py-12 text-neutral-400">Belum ada collection</div>
-        @endforelse dwd
+        @endforelse 
       </div>
     </section>
 
