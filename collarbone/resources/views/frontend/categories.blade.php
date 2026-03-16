@@ -330,11 +330,7 @@
                 </a>
             </nav>
 
-            <!-- Cart Icon -->
-            <button id="cartToggleBtn" class="relative p-2 hover:bg-neutral-100 rounded-full transition-colors" aria-label="Cart">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span id="cartBadge" class="absolute -top-1 -right-1 bg-[#2a9d9d] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
-            </button>
+
 
             <button id="menuToggle" class="lg:hidden group p-2 hover:bg-neutral-100 rounded-full transition-colors">
                 <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -355,8 +351,8 @@
 
         <!-- Mobile Menu (Hidden by default) -->
         <nav id="mobileMenu"
-            class="lg:hidden hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-neutral-200 animate-slide-in shadow-lg">
-            <div class="py-8 px-6 space-y-6 flex flex-col items-center">
+            class="lg:hidden hidden absolute top-full left-0 right-0 h-[calc(100vh-4.5rem)] bg-white overflow-y-auto border-t border-neutral-100 shadow-xl z-40">
+            <div class="py-12 px-6 space-y-8 flex flex-col items-center">
                 <a href="{{ route('home') }}"
                     class="text-sm font-medium tracking-[0.2em] uppercase hover:text-orbis-teal transition-colors relative group">
                     Dashboard
@@ -480,7 +476,7 @@
                         @if($loop->index >= 4) tshirt-hidden hidden opacity-0 transform translate-y-8 @endif
                         delay-{{ ($loop->index % 4) * 100 }}">
                         
-                        <div class="perspective-1000 mb-4">
+                        <div class="perspective-1000 mb-4 relative">
                             <div class="relative transition-all duration-700 transform-style-3d w-full aspect-[3/4]">
                                 <div class="absolute inset-0 backface-hidden bg-neutral-100 overflow-hidden border-2 border-black rounded-sm">
                                     <div class="product-slider" data-slider>
@@ -507,6 +503,8 @@
                                     <p class="text-xs text-neutral-500 leading-relaxed mb-6">{{ Str::limit($product->description, 60) }}</p>
                                 </div>
                             </div>
+                            <!-- Details Button inside photo card -->
+                            <button class="details-btn absolute bottom-3 right-3 z-20 uppercase tracking-widest px-3 py-1.5 border border-neutral-900 bg-white/90 hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium backdrop-blur-sm shadow-sm">Details</button>
                         </div>
                         <p class="text-[10px] tracking-widest text-neutral-500 mb-1">T-SHIRTS</p>
                         <h3 class="text-sm font-medium text-neutral-900 mb-1">{{ $product->name }}</h3>
@@ -540,8 +538,7 @@
                                             title="{{ $colorName }}"></span>
                                     </div>
                                     <div class="flex gap-1">
-                                        <button
-                                            class="details-btn uppercase tracking-widest px-2 py-1.5 border border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium">Details</button>
+
                                         <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
                                             data-name="{{ $product->name }}"
                                             data-price="{{ (int)$product->price }}"
@@ -583,7 +580,7 @@
                    
                    @foreach($pins as $pin)
                     <article class="group cursor-pointer reveal-on-scroll delay-{{ ($loop->index % 3) * 100 }}">
-                        <div class="perspective-1000 mb-4 rounded-lg border-2 border-gray-200 p-2 bg-white">
+                        <div class="perspective-1000 mb-4 rounded-lg border-2 border-gray-200 p-2 bg-white relative">
                             <div class="relative transition-all duration-700 transform-style-3d w-full aspect-square">
                                 <div class="absolute inset-0 bg-white overflow-hidden rounded-full border border-neutral-100 shadow-sm hover:shadow-md transition-shadow">
                                     <img src="{{ $pin->thumbnail ?? asset('img/placeholder.jpg') }}" alt="{{ $pin->name }}"
@@ -595,12 +592,14 @@
                                     <button class="text-[10px] border-b border-black pb-0.5 hover:text-neutral-500 transition-colors uppercase tracking-widest back-btn">Back</button>
                                 </div>
                             </div>
+                            <!-- Details Button inside photo card -->
+                            <button class="details-btn absolute bottom-3 right-3 z-20 uppercase tracking-widest px-3 py-1.5 border border-neutral-900 bg-white/90 hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium backdrop-blur-sm shadow-sm hover:shadow-md">Details</button>
                         </div>
                         <h3 class="text-sm font-medium text-center text-neutral-900 mb-1">{{ $pin->name }}</h3>
                         <div class="flex flex-col items-center gap-1">
                             <p class="text-xs text-center text-neutral-500">IDR {{ number_format($pin->price, 0, ',', '.') }}</p>
                             <div class="flex gap-1 mt-1">
-                                <button class="details-btn uppercase tracking-widest px-2 py-1.5 border border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium">Details</button>
+
                                 <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
                                     data-name="{{ $pin->name }}"
                                     data-price="{{ (int)$pin->price }}"
@@ -637,6 +636,12 @@
             </p>
         </div>
     </footer>
+
+    <!-- Floating Cart Button -->
+    <button id="cartToggleBtn" class="fixed bottom-6 right-6 z-[140] p-4 bg-[#2a9d9d] text-white border-none rounded-full shadow-2xl hover:-translate-y-1 hover:shadow-xl hover:bg-[#238b8b] transition-all duration-300 pointer-events-auto" aria-label="Cart">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center hidden shadow-sm border-2 border-white">0</span>
+    </button>
 
     <!-- Cart Overlay -->
     <div id="cartOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] opacity-0 pointer-events-none"></div>

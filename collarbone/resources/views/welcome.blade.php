@@ -168,10 +168,6 @@
         <h2 id="slideTitle" class="text-white text-3xl lg:text-5xl font-light tracking-orbis mb-6 animate-fade-up">
           {{ $heroSlides->first()->title ?? 'Welcome' }}
         </h2>
-        <a id="slideLink" href="{{ $heroSlides->first()->link ?? '#' }}"
-          class="inline-flex items-center justify-center px-8 py-3 text-xs font-medium tracking-[0.2em] uppercase bg-white text-neutral-900 border border-white hover:bg-neutral-900 hover:text-white transition-all duration-300">
-          ORDER NOW
-        </a>
       </div>
 
       <!-- Dots Navigation -->
@@ -204,7 +200,7 @@
         </a>
         @empty
         <div class="col-span-3 text-center py-12 text-neutral-400">Belum ada collection</div>
-        @endforelse
+        @endforelse dwd
       </div>
     </section>
 

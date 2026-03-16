@@ -34,14 +34,28 @@ class FrontendController extends Controller
      * New Arrivals page.
      */
     
-    public function newArrivals()
+    public function newArrivals(Request $request)
     {
-        $products = Product::where('is_new_arrival', true)
+        $query = Product::where('is_new_arrival', true)
             ->where('is_active', true)
-            ->with('category')
-            ->orderByRaw('sort_order = 0, sort_order')
-            ->latest()
-            ->get();
+            ->with('category');
+
+        $sort = $request->query('sort', 'latest');
+
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderByRaw('sort_order = 0, sort_order')->latest();
+                break;
+        }
+
+        $products = $query->get();
 
         $banner = \App\Models\Banner::firstOrCreate(
             ['page_name' => 'new_arrivals'],

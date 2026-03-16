@@ -317,11 +317,7 @@
         </a>
       </nav>
 
-      <!-- Cart Icon -->
-      <button id="cartToggleBtn" class="relative p-2 hover:bg-neutral-100 rounded-full transition-colors" aria-label="Cart">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span id="cartBadge" class="absolute -top-1 -right-1 bg-[#2a9d9d] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
-      </button>
+
 
       <!-- Mobile Menu Toggle -->
       <button id="menuToggle" class="lg:hidden group p-2 hover:bg-neutral-100 rounded-full transition-colors">
@@ -343,8 +339,8 @@
 
     <!-- Mobile Navigation -->
     <nav id="mobileMenu"
-      class="lg:hidden hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-neutral-200 animate-slide-in shadow-lg">
-      <div class="py-8 px-6 space-y-6 flex flex-col items-center">
+      class="lg:hidden hidden absolute top-full left-0 right-0 h-[calc(100vh-4.5rem)] bg-white overflow-y-auto border-t border-neutral-100 shadow-xl z-40">
+      <div class="py-12 px-6 space-y-8 flex flex-col items-center">
         <a href="{{ route('home') }}"
           class="text-sm font-medium tracking-[0.2em] uppercase hover:text-orbis-teal transition-colors relative group">
           Dashboard
@@ -390,19 +386,26 @@
       <div class="flex flex-col md:flex-row items-center justify-between px-6 lg:px-12 py-4 gap-4">
 
         <!-- Mobile Filter Toggle (visible only on small) -->
-        <div class="md:hidden w-full flex justify-between">
+        <div class="md:hidden w-full flex justify-between items-center">
           <button class="text-xs uppercase tracking-widest flex items-center gap-2">
             Filters <span
               class="bg-black text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px]">2</span>
           </button>
-          <button class="text-xs uppercase tracking-widest">Sort By</button>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-neutral-400 uppercase tracking-widest">Sort by:</span>
+            <select class="text-xs uppercase tracking-widest border-none bg-transparent focus:ring-0 cursor-pointer p-0" onchange="updateSort(this.value)">
+              <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
+              <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+              <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+            </select>
+          </div>
         </div>
         <div class="hidden md:flex items-center gap-2">
           <span class="text-[10px] text-neutral-400 uppercase tracking-widest">Sort by:</span>
-          <select class="text-xs uppercase tracking-widest border-none bg-transparent focus:ring-0 cursor-pointer">
-            <option>Latest</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
+          <select class="text-xs uppercase tracking-widest border-none bg-transparent focus:ring-0 cursor-pointer" onchange="updateSort(this.value)">
+            <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
+            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
           </select>
         </div>
 
@@ -414,7 +417,7 @@
 
     <!-- Product Grid -->
     <section class="w-full mx-auto px-6 lg:px-12 py-12">
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
+      <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 min-h-[500px] transition-opacity duration-300">
 
         @foreach($products as $index => $product)
             <!-- Spotlight Section logic: Insert after 4th product -->
@@ -435,7 +438,7 @@
 
             <article class="group cursor-pointer blur-in delay-{{ ($index % 4) * 100 }}">
               <!-- Image flip container -->
-              <div class="perspective-1000 mb-4">
+              <div class="perspective-1000 mb-4 relative">
                 <div class="relative transition-all duration-700 transform-style-3d w-full aspect-[3/4]">
                   <!-- Front (Slider) -->
                   <div class="absolute inset-0 backface-hidden bg-neutral-100 overflow-hidden rounded-sm border-2 border-black">
@@ -461,6 +464,8 @@
                     <p class="text-xs text-neutral-500 leading-relaxed mb-6">{{ Str::limit($product->description, 100) }}</p>
                   </div>
                 </div>
+                <!-- Details Button inside photo card -->
+                <button class="details-btn absolute bottom-3 right-3 z-20 uppercase tracking-widest px-3 py-1.5 border border-neutral-900 bg-white/90 hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium backdrop-blur-sm shadow-sm">Details</button>
               </div>
               <!-- Product info -->
               <p class="text-[10px] tracking-widest text-neutral-500 mb-1">{{ $product->category->name ?? 'CATEGORY' }}</p>
@@ -483,7 +488,7 @@
                      @endforeach
                   </div>
                   <div class="flex gap-1">
-                    <button class="details-btn uppercase tracking-widest px-2 py-1.5 border border-neutral-900 bg-white hover:bg-neutral-900 text-neutral-900 hover:text-white transition-all duration-300 rounded-sm text-[10px] font-medium">Details</button>
+
                     <button class="cart-quick-btn p-1.5 border border-neutral-300 bg-white hover:bg-neutral-900 hover:text-white hover:border-neutral-900 text-neutral-900 transition-all duration-300 rounded-sm"
                         data-name="{{ $product->name }}"
                         data-price="{{ (int)$product->price }}"
@@ -687,31 +692,88 @@
 
     document.querySelectorAll('.blur-in').forEach(el => observer.observe(el));
 
-    // Flip Card Interaction
-    document.querySelectorAll('.details-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const article = btn.closest('article');
-        const cardInner = article ? article.querySelector('.transform-style-3d') : null;
+    // Flip Card Interaction function
+    function initFlipCards(container = document) {
+      container.querySelectorAll('.details-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const article = btn.closest('article');
+          const cardInner = article ? article.querySelector('.transform-style-3d') : null;
 
-        if (cardInner) {
-          btn.classList.add('opacity-0', 'scale-90');
+          if (cardInner) {
+            btn.classList.add('opacity-0', 'scale-90');
 
-          const isFlippingToBack = !cardInner.classList.contains('rotate-y-180');
-          if (isFlippingToBack) {
-            cardInner.classList.add('rotate-y-180');
-          } else {
-            cardInner.classList.remove('rotate-y-180');
+            const isFlippingToBack = !cardInner.classList.contains('rotate-y-180');
+            if (isFlippingToBack) {
+              cardInner.classList.add('rotate-y-180');
+            } else {
+              cardInner.classList.remove('rotate-y-180');
+            }
+
+            setTimeout(() => {
+              btn.textContent = isFlippingToBack ? 'Back' : 'Details';
+              btn.classList.remove('opacity-0', 'scale-90');
+            }, 300);
           }
-
-          setTimeout(() => {
-            btn.textContent = isFlippingToBack ? 'Back' : 'Details';
-            btn.classList.remove('opacity-0', 'scale-90');
-          }, 300);
-        }
+        });
       });
-    });
+    }
+    
+    // Initial call
+    initFlipCards();
+
+    // AJAX Sorting
+    window.updateSort = function(sortValue) {
+      // Sync dropdowns
+      document.querySelectorAll('select[onchange^="updateSort"]').forEach(select => {
+        select.value = sortValue;
+      });
+
+      const grid = document.getElementById('productGrid');
+      if(grid) {
+        grid.style.opacity = '0.4';
+        grid.style.pointerEvents = 'none';
+      }
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('sort', sortValue);
+      window.history.pushState({}, '', url);
+
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newGrid = doc.getElementById('productGrid');
+
+          if(newGrid && grid) {
+            grid.innerHTML = newGrid.innerHTML;
+            grid.style.opacity = '1';
+            grid.style.pointerEvents = 'auto';
+
+            // Re-initialize scripts for new DOM
+            grid.querySelectorAll('.blur-in').forEach(el => observer.observe(el));
+            grid.querySelectorAll('[data-slider]').forEach(slider => {
+              new ProductSlider(slider);
+            });
+            initFlipCards(grid);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          if(grid) {
+            grid.style.opacity = '1';
+            grid.style.pointerEvents = 'auto';
+          }
+        });
+    }
   </script>
+
+  <!-- Floating Cart Button -->
+  <button id="cartToggleBtn" class="fixed bottom-6 right-6 z-[140] p-4 bg-[#2a9d9d] text-white border-none rounded-full shadow-2xl hover:-translate-y-1 hover:shadow-xl hover:bg-[#238b8b] transition-all duration-300 pointer-events-auto" aria-label="Cart">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span id="cartBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center hidden shadow-sm border-2 border-white">0</span>
+  </button>
 
   <!-- Cart Overlay -->
   <div id="cartOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] opacity-0 pointer-events-none"></div>
